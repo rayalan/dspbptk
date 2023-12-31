@@ -52,3 +52,10 @@ class ActionDump(BaseAction):
 				print("%5d  %s" % (count, item_name))
 			if len(self._args.infile) > 1:
 				print()
+	@classmethod
+	def register(cls, multicommand):
+		def genparser(parser):
+			parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
+			parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
+			parser.add_argument("infile", nargs = "+", help = "Input blueprint text file(s)")
+		multicommand.register("dump", "Dump some information about a blueprint", genparser, action = cls)

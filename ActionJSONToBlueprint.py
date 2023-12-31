@@ -42,3 +42,12 @@ class ActionJSONToBlueprint(BaseAction):
 #				f.write("\n")
 #			else:
 #				json.dump(bp_dict, f)
+
+	@classmethod
+	def register(cls, multicommand):
+		def genparser(parser):
+			parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite output file if it exists.")
+			parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
+			parser.add_argument("infile", help = "Input JSON file")
+			parser.add_argument("outfile", help = "Output blueprint text file")
+		multicommand.register("json2bp", "Convert a JSON document to blueprint", genparser, action = ActionJSONToBlueprint)

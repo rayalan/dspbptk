@@ -38,3 +38,14 @@ class ActionBlueprintToJSON(BaseAction):
 				f.write("\n")
 			else:
 				json.dump(bp_dict, f)
+
+	@classmethod
+	def register(cls, multicommand):
+		def genparser(parser):
+			parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite output file if it exists.")
+			parser.add_argument("-p", "--pretty-print", action = "store_true", help = "Create a pretty-printed output JSON file.")
+			parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
+			parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
+			parser.add_argument("infile", help = "Input blueprint text file")
+			parser.add_argument("outfile", help = "Output JSON file")
+		multicommand.register("bp2json", "Convert a blueprint to JSON", genparser, action = ActionBlueprintToJSON)

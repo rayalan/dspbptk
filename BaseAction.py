@@ -26,3 +26,7 @@ class BaseAction():
 
 	def run(self):
 		raise NotImplementedError()
+
+	@classmethod
+	def register(cls, _):
+		raise NotImplementedError()

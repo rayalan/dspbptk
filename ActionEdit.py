@@ -32,3 +32,14 @@ class ActionEdit(BaseAction):
 		if self._args.short_desc is not None:
 			bp.short_desc = self._args.short_desc
 		bp.write_to_file(self._args.outfile)
+
+	@classmethod
+	def register(cls, multicommand):
+		def genparser(parser):
+			parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite output file if it exists.")
+			parser.add_argument("--short-desc", metavar = "description", help = "Set short description to this value.")
+			parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
+			parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
+			parser.add_argument("infile", help = "Input blueprint text file")
+			parser.add_argument("outfile", help = "Output blueprint text file")
+		multicommand.register("edit", "Edit a blueprint", genparser, action = ActionEdit)
