@@ -22,6 +22,8 @@ import enum
 
 class DysonSphereItem(enum.IntEnum):
 	Lava = -1
+	PlasmaRefining = 16
+	XRayCracking = 58
 	IronOre = 1001
 	CopperOre = 1002
 	SiliconOre = 1003
@@ -94,9 +96,9 @@ class DysonSphereItem(enum.IntEnum):
 	DysonSphereComponent = 1502
 	SmallCarrierRocket = 1503
 	Foundation = 1131
-	AccelerantMkI = 1141
-	AccelerantMkII = 1142
-	AccelerantMkIII = 1143
+	ProliferatorMkI = 1141
+	ProliferatorMkII = 1142
+	ProliferatorMkIII = 1143
 	ConveyorBeltMKI = 2001
 	ConveyorBeltMKII = 2002
 	ConveyorBeltMKIII = 2003
@@ -104,9 +106,12 @@ class DysonSphereItem(enum.IntEnum):
 	SorterMKII = 2012
 	SorterMKIII = 2013
 	Splitter = 2020
+	TrafficMonitor = 2030
+	AutomaticPiler = 2040
 	StorageMKI = 2101
 	StorageMKII = 2102
 	StorageTank = 2106
+	LogisticsDistributor = 2107
 	AssemblingMachineMkI = 2303
 	AssemblingMachineMkII = 2304
 	AssemblingMachineMkIII = 2305
@@ -118,13 +123,14 @@ class DysonSphereItem(enum.IntEnum):
 	ThermalPowerStation = 2204
 	MiniFusionPowerStation = 2211
 	MiningMachine = 2301
-	Smelter = 2302
+	ArcSmelter = 2302
 	OilExtractor = 2307
 	OilRefinery = 2308
 	WaterPump = 2306
 	ChemicalPlant = 2309
 	Fractionator = 2314
 	SprayCoater = 2313
+	AdvancedMiningMachine = 2316
 	SolarPanel = 2205
 	Accumulator = 2206
 	AccumulatorFull = 2207

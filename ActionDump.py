@@ -39,7 +39,7 @@ class ActionDump(BaseAction):
 			if bp.short_desc != "":
 				print("Text          : %s" % (bp.short_desc))
 			if bp.long_desc != "":
-				print("Description   : %s" % (bp.long_desc))
+				print("Description   : %s\n" % (bp.long_desc))
 			if self._args.verbose >= 1:
 				print("Game version  : %s" % (bp.game_version))
 			print("Building count: %d" % (len(bpd.buildings)))
