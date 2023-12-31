@@ -1,8 +1,30 @@
 # dspbptk
+
 This is dspbptk, the [Dyson Sphere Program](https://store.steampowered.com/app/1366540/Dyson_Sphere_Program/)
 Blueprint toolkit. Dyson Sphere Program is an *amazing* factory-building game
 by the incredibly talented indie-dev [Youthcat Studio](https://twitter.com/dysonprogram).
 It allows blueprinting files to disk and then reusing them in other parts of your game.
+
+# How to use it
+
+```
+git clone https://github.com/rayalan/dspbptk.git
+cd dspbptk
+./dspbptk --help
+./dspbptk dump path/to/blueprint
+./dpsbptk bp2json path/to/blueprint example.json
+cat example.json
+```
+# What does it do?
+
+* Summarizes blueprints
+* Convert a blueprint to JSON
+* Extendable framework for editing blueprint (see ActionEdit)
+* Extendable framework for rendering/inspecting blueprints
+
+# Background
+
+This is an [updated fork](https://github.com/johndoe31415/dspbptk) which did all the initial work on decoding blueprints. Here's the original vision and context:
 
 There are some cool things that could be done with this import/export
 functionality, and what I had in mind was something like:
@@ -31,7 +53,6 @@ Now, all of this can obviously done in the game. So there are two possible solut
   2. Spends hours reverse engineering DSP and implementing the necessary bits
 
 Obviously, I prefer option (2).
-
 
 ## Why is this difficult?
 Dyson Sphere Program kindof "authenticates" blueprints. Essentially, the
@@ -116,11 +137,9 @@ so that it's accepted in DSP:
 $ ./dspbptk edit --short-desc "New description" "bps/Processor Factory.txt" new.txt
 ```
 
-
 ## Thanks
 Thanks to Youthcat Studio for an incredible game. You are absolutely fantastic
 and your game is ridiculously good and addictive.
-
 
 ## License
 GNU GPL-3.
