@@ -20,7 +20,7 @@
 
 import os
 from BaseAction import BaseAction
-from Blueprint import Blueprint
+from dspbp.Blueprint import Blueprint
 
 class ActionEdit(BaseAction):
 	def run(self):

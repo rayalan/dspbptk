@@ -21,8 +21,8 @@
 import json
 import collections
 from BaseAction import BaseAction
-from Blueprint import Blueprint
-from Enums import DysonSphereItem
+from dspbp.Blueprint import Blueprint
+from dspbp.Enums import DysonSphereItem
 
 class ActionDump(BaseAction):
 	def run(self):

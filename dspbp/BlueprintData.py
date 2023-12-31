@@ -19,8 +19,9 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import collections
-from NamedStruct import NamedStruct
-from Enums import DysonSphereItem, LogisticsStationDirection
+
+from .NamedStruct import NamedStruct
+from .Enums import DysonSphereItem, LogisticsStationDirection
 
 class StationParameters():
 	_Parameters = collections.namedtuple("Parameters", [ "work_energy", "drone_range", "vessel_range", "orbital_collector", "warp_distance", "equip_warper", "drone_count", "vessel_count" ])
