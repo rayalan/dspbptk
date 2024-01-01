@@ -17,6 +17,7 @@
 #	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 #	Johannes Bauer <JohannesBauer@gmx.de>
+import os
 
 class BaseAction():
 	def __init__(self, cmdname, args):
@@ -30,3 +31,27 @@ class BaseAction():
 	@classmethod
 	def register(cls, _):
 		raise NotImplementedError()
+
+	@staticmethod
+	def find_blueprints(inputs):
+		"""
+		Find all blueprint files given a list of files and/or directories
+
+		Typical usage:
+			blueprint_files = self.find_blueprints(self._args.inputs)
+		"""
+		input_files = []
+		for input in inputs:
+			if os.path.isfile(input):
+				input_files.append(input)
+			elif os.path.isdir(input):
+				for root, _, files in os.walk(input):
+					print(f'Searching {root}...')
+
+					for blueprint_file in files:
+						if blueprint_file == '_intro_' or not blueprint_file.endswith('.txt'):
+							continue
+						input_files.append(os.path.join(root, blueprint_file))
+			else:
+				raise ValueError(f'Unknown input {input}')
+		return input_files
