@@ -131,6 +131,7 @@ class DysonSphereItem(enum.IntEnum):
 	Fractionator = 2314
 	SprayCoater = 2313
 	AdvancedMiningMachine = 2316
+	QuantumChemicalPlant = 2317
 	SolarPanel = 2205
 	Accumulator = 2206
 	AccumulatorFull = 2207
@@ -144,6 +145,10 @@ class DysonSphereItem(enum.IntEnum):
 	InterstellarLogisticsStation = 2104
 	OrbitalCollector = 2105
 	MatrixLab = 2901
+	MissileTurret = 3005
+	SignalTower = 3007
+	ShieldGenerator = 3008
+	BattlefieldAnalysisBase = 3009
 	ElectromagneticMatrix = 6001
 	EnergyMatrix = 6002
 	StructureMatrix = 6003
