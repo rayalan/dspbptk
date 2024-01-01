@@ -21,47 +21,64 @@ import os
 
 from BaseAction import BaseAction
 from dspbp.Blueprint import Blueprint
-from dspbp.Enums import DysonSphereItem
+from dspbp.Enums import DysonSphereItem, Recipe
+
+def maybeDysonSphereItem(id_):
+	try:
+		return DysonSphereItem(id_)
+	except ValueError:
+		return None
+
+def maybeRecipe(id_):
+	try:
+		return Recipe(id_)
+	except ValueError:
+		return None
 
 class ActionSearchUnknownIds(BaseAction):
 	def run(self):
-		for folder in self._args.folders:
-			# if len(self._args.infile) > 1:
-			# 	print(f"{filename}:")
-			for root, dirs, files in os.walk(folder):
-				# print(root, dirs, files)
-				print(f'Searching {root}...')
 
-				for blueprint_file in files:
-					if blueprint_file == '_intro_':
-						continue
-					bp = Blueprint.read_from_file(os.path.join(root, blueprint_file), validate_hash = not self._args.ignore_corrupt)
-					bpd = bp.decoded_data
+		input_files = self.find_blueprints(self._args.inputs)
 
-					building_counter = collections.Counter()
-					for building in bpd.buildings:
-						building_counter[building.data.item_id] += 1
+		new_ids = {}
 
-			# if bp.short_desc != "":
-			# 	print("Text          : %s" % (bp.short_desc))
-			# if bp.long_desc != "":
-			# 	print("Description   : %s\n" % (bp.long_desc))
-			# if self._args.verbose >= 1:
-			# 	print("Game version  : %s" % (bp.game_version))
-			# print("Building count: %d" % (len(bpd.buildings)))
-					for (item_id, count) in building_counter.most_common():
-						try:
-							item = DysonSphereItem(item_id)
-							item_name = item.name
-						except ValueError:
-							item_name = f"[{item_id}]"
-							print("%5d  %s %s" % (count, item_name, blueprint_file))
-			# if len(self._args.infile) > 1:
-			# 	print()
+		for blueprint_file in input_files:
+			if blueprint_file == '_intro_':
+				continue
+			bp = Blueprint.read_from_file(blueprint_file, validate_hash = not self._args.ignore_corrupt)
+			bpd = bp.decoded_data
+
+			building_counter = collections.Counter()
+			for building in bpd.buildings:
+				building_counter[building.data.item_id] += 1
+				if building.data.recipe_id:
+					# print(building.data.recipe_id)
+					if not maybeRecipe(building.data.recipe_id):
+						name = f'{building.data.recipe_id} (recipe)'
+						if name not in new_ids:
+							new_ids[name] = set([])
+						new_ids[name].add(blueprint_file)
+
+
+			for (item_id, count) in building_counter.most_common():
+				try:
+					item = DysonSphereItem(item_id)
+				except ValueError:
+					if item_id not in new_ids:
+						new_ids[item_id] = set([])
+					new_ids[item_id].add(blueprint_file)
+
+		if len(new_ids):
+			print(f'New ids ({len(new_ids)} entries):')
+		else:
+			print('No new ids found')
+		for item, blueprints in new_ids.items():
+			print(f'\t{item}: {', '.join(blueprints)}')
+
 	@classmethod
 	def register(cls, multicommand):
 		def genparser(parser):
 			parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
 			parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
-			parser.add_argument("folders", nargs = "+", help = "Input blueprint directory(s)")
+			parser.add_argument("inputs", nargs = "+", help = "Input blueprint file(s) and/or directory(s)")
 		multicommand.register("search-new-ids", "Search all blueprints for unknown ids", genparser, action = cls)
