@@ -118,6 +118,9 @@ class BlueprintArea():
 	def to_dict(self):
 		return self._fields._asdict()
 
+	def pack(self):
+		return self._BLUEPRINT_AREA.pack(self._fields._asdict())
+
 	@classmethod
 	def deserialize(cls, data, offset):
 		fields = cls._BLUEPRINT_AREA.unpack_head(data, offset)
@@ -190,6 +193,9 @@ class BlueprintBuilding():
 			result["parameters"] = result["parameters"].to_dict()
 		return result
 
+	def pack(self):
+		return self._BLUEPRINT_BUILDING.pack(self._fields._asdict()) + b''.join([value.to_bytes(length=4, byteorder='little') for value in self.raw_parameters])
+
 	@classmethod
 	def deserialize(cls, data, offset):
 		fields = cls._BLUEPRINT_BUILDING.unpack_head(data, offset)
@@ -227,6 +233,14 @@ class BlueprintData():
 		result["areas"] = [ area.to_dict() for area in self._areas ]
 		result["buildings"] = [ building.to_dict() for building in self._buildings ]
 		return result
+
+	def serialize(self):
+		serialized_data = b''.join(
+			[self._HEADER.pack(self._header._asdict())] +
+			[area.pack() for area in self._areas] +
+			[self._BUILDING_HEADER.pack({'building_count' : len(self._buildings)})] +
+			[building.pack() for building in self._buildings])
+		return serialized_data
 
 	@classmethod
 	def deserialize(cls, data):

@@ -25,6 +25,9 @@ from ActionBlueprintToJSON import ActionBlueprintToJSON
 from ActionJSONToBlueprint import ActionJSONToBlueprint
 from ActionDump import ActionDump
 from ActionEdit import ActionEdit
+from ActionSearchUnknownIds import ActionSearchUnknownIds
+from ActionInspect import ActionInspect
+from ActionValidateSerialize import ActionValidateSerialize
 
 mc = MultiCommand()
 
@@ -32,5 +35,8 @@ ActionBlueprintToJSON.register(mc)
 ActionDump.register(mc)
 ActionJSONToBlueprint.register(mc)
 ActionEdit.register(mc)
+ActionSearchUnknownIds.register(mc)
+ActionInspect.register(mc)
+ActionValidateSerialize.register(mc)
 
 mc.run(sys.argv[1:])

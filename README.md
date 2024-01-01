@@ -19,8 +19,23 @@ cat example.json
 
 * Summarizes blueprints
 * Convert a blueprint to JSON
+* Edit a blueprint (in progress)
 * Extendable framework for editing blueprint (see ActionEdit)
 * Extendable framework for rendering/inspecting blueprints
+
+# For developers
+
+## inspect
+
+The inspect command is a sandbox command for exploring the data.
+
+## search-new-ids
+
+DysonSphereProgram adds new items (e.g. recipes, buildings) periodically. This command scans blueprints for unknown ids to facilitate finding and updating the enumerated ids.
+
+## validate-serialize
+
+This command tries to re-serialize all blueprints and ensures that the original matches byte-for-byte. Useful for validating any serialization changes.
 
 # Background
 
