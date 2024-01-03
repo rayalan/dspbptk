@@ -19,17 +19,101 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 
 import collections
+import enum
 
 from .NamedStruct import NamedStruct
 from .Enums import DysonSphereItem, LogisticsStationDirection
 
-class StationParameters():
+PLANETARY_LOGISTICS_STATION_STORAGE_SIZE = 4
+INTERSTELLAR_LOGISTICS_STATION_STORAGE_SIZE = 5
+
+class CustomizedParameters():
+	"""
+	Base class for buildings with understood parameters which allows them to be reconstructed.
+	"""
+	def __init__(self, parameters):
+		self._raw_parameters = parameters
+
+	@property
+	def raw_parameters(self):
+		"""
+		Returns a copy of the raw parameters for this instance, updated with any value changes
+		"""
+		parameters = list(self._raw_parameters)
+		for index, value in self._encode_parameter_map.items():
+			value = (1 if value else 0) if isinstance(value, bool) else value
+			if not isinstance(value, int):
+				raise ValueError(f'Unable to convert {value} parameter (index={index} for {self}')
+			parameters[index] = value
+		return parameters
+
+	@property
+	def _encode_parameter_map(self):
+		"""
+		Returns a map of parameter index to values. Any missing parameters will use their original value.
+		"""
+		raise NotImplementedError(f'{self.__class__} unable to map parameter to original indices')
+
+class LogisticsDistributorParameters(CustomizedParameters):
+	_Parameters = collections.namedtuple('Parameters', [ "supply_icarus_logic", "supply_logic", "work_energy", "autofill"])
+	__PARAMETER_KEY_OFFSETS = {
+		'supply_icarus_logic' : 0,
+		'supply_logic' : 1,
+		'work_energy' : 2,
+		'autofill' : 3,
+	}
+
+	__PARAMETER_CONVERTERS = {
+		'supply_logic' : LogisticsStationDirection
+	}
+
+	def __init__(self, parameters):
+		super().__init__(parameters)
+		self._parameters = self._Parameters(**{
+			key :
+				self.__PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self.__PARAMETER_KEY_OFFSETS.items()
+		})
+
+	@property
+	def _encode_parameter_map(self):
+		return self.__PARAMETER_KEY_OFFSETS
+
+	@property
+	def parameters(self):
+		return self._parameters
+
+
+class StationParameters(CustomizedParameters):
 	_Parameters = collections.namedtuple("Parameters", [ "work_energy", "drone_range", "vessel_range", "orbital_collector", "warp_distance", "equip_warper", "drone_count", "vessel_count" ])
 	_STORAGE_OFFSET = 0
 	_SLOTS_OFFSET = _STORAGE_OFFSET + 192
 	_PARAMETERS_OFFSET = _SLOTS_OFFSET + 128
 
+	_STORAGE_KEY_OFFSETS = {
+		'item_id' : 0,
+		'local_logic' : 1,
+		'remote_logic' : 2,
+		'max_count' : 3
+	}
+
+	_SLOT_KEY_OFFSETS = {
+		'direction': 0,
+		'storage_index' : 1
+	}
+
+	_PARAMETER_KEY_OFFSETS = {
+		'work_energy': 0,
+		'drone_range': 1,
+		'vessel_range': 2,
+		'orbital_collector': 3,
+		'warp_distance': 4,
+		'equip_warper': 5,
+		'drone_count': 6,
+		'vessel_count': 7,
+	}
+
 	def __init__(self, parameters, storage_len, slots_len):
+		super().__init__(parameters)
 		self._storage = self._parse_storage(parameters, storage_len)
 		self._slots = self._parse_slots(parameters, slots_len)
 		self._parameters = self._parse_parameters(parameters)
@@ -45,6 +129,22 @@ class StationParameters():
 	@property
 	def parameters(self):
 		return self._parameters
+
+	@property
+	def _encode_parameter_map(self):
+		mapping = {}
+		for ix, storage in enumerate(self.storage):
+			storage_offset = self._STORAGE_OFFSET + (6 * ix)
+			for key, offset in self._STORAGE_KEY_OFFSETS.items():
+				mapping[storage_offset + offset] = storage[key] if storage else 0
+		for ix, slot in enumerate(self.slots):
+			slot_offset  = self._SLOTS_OFFSET + (4 * ix)
+			for key, offset in self._SLOT_KEY_OFFSETS.items():
+				original_value = self._raw_parameters[slot_offset + offset]
+				mapping[slot_offset + offset] = slot[key] if slot else original_value
+		for key, offset in self._PARAMETER_KEY_OFFSETS.items():
+			mapping[self._PARAMETERS_OFFSET + offset] = getattr(self.parameters, key)
+		return mapping
 
 	def _parse_storage(self, parameters, storage_len):
 		storage = [ ]
@@ -175,9 +275,11 @@ class BlueprintBuilding():
 	@property
 	def parameters(self):
 		if self.item == DysonSphereItem.PlanetaryLogisticsStation:
-			return StationParameters(self._parameters, storage_len = 3, slots_len = 12)
+			return StationParameters(self._parameters, storage_len = PLANETARY_LOGISTICS_STATION_STORAGE_SIZE, slots_len = 12)
 		elif self.item == DysonSphereItem.InterstellarLogisticsStation:
-			return StationParameters(self._parameters, storage_len = 5, slots_len = 12)
+			return StationParameters(self._parameters, storage_len = INTERSTELLAR_LOGISTICS_STATION_STORAGE_SIZE, slots_len = 12)
+		elif self.item == DysonSphereItem.LogisticsDistributor:
+			return LogisticsDistributorParameters(self._parameters)
 		return self._parameters
 
 	@property
@@ -194,7 +296,12 @@ class BlueprintBuilding():
 		return result
 
 	def pack(self):
-		return self._BLUEPRINT_BUILDING.pack(self._fields._asdict()) + b''.join([value.to_bytes(length=4, byteorder='little') for value in self.raw_parameters])
+		raw_parameters = self.raw_parameters
+		try:
+			raw_parameters = self.parameters.raw_parameters
+		except AttributeError:
+			pass
+		return self._BLUEPRINT_BUILDING.pack(self._fields._asdict()) + b''.join([value.to_bytes(length=4, byteorder='little') for value in raw_parameters])
 
 	@classmethod
 	def deserialize(cls, data, offset):
