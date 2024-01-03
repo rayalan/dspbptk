@@ -22,22 +22,11 @@ import os
 from BaseAction import BaseAction
 from dspbp.Blueprint import Blueprint
 from dspbp.Enums import DysonSphereItem, Recipe
+from dspbp.Utils import maybeDysonSphereItem, maybeRecipe
 
-def maybeDysonSphereItem(id_):
-	try:
-		return DysonSphereItem(id_)
-	except ValueError:
-		return None
-
-def maybeRecipe(id_):
-	try:
-		return Recipe(id_)
-	except ValueError:
-		return None
 
 class ActionSearchUnknownIds(BaseAction):
 	def run(self):
-
 		input_files = self.find_blueprints(self._args.inputs)
 
 		new_ids = {}
@@ -52,13 +41,11 @@ class ActionSearchUnknownIds(BaseAction):
 			for building in bpd.buildings:
 				building_counter[building.data.item_id] += 1
 				if building.data.recipe_id:
-					# print(building.data.recipe_id)
 					if not maybeRecipe(building.data.recipe_id):
 						name = f'{building.data.recipe_id} (recipe)'
 						if name not in new_ids:
 							new_ids[name] = set([])
 						new_ids[name].add(blueprint_file)
-
 
 			for (item_id, count) in building_counter.most_common():
 				try:
