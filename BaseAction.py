@@ -19,6 +19,8 @@
 #	Johannes Bauer <JohannesBauer@gmx.de>
 import os
 
+from dspbp.Blueprint import Blueprint
+
 class BaseAction():
 	def __init__(self, cmdname, args):
 		self._cmd = cmdname
@@ -33,7 +35,7 @@ class BaseAction():
 		raise NotImplementedError()
 
 	@staticmethod
-	def find_blueprints(inputs):
+	def find_blueprints(inputs, verbosity=0):
 		"""
 		Find all blueprint files given a list of files and/or directories
 
@@ -46,7 +48,8 @@ class BaseAction():
 				input_files.append(input)
 			elif os.path.isdir(input):
 				for root, _, files in os.walk(input):
-					print(f'Searching {root}...')
+					if verbosity > 0:
+						print(f'Searching {root}...')
 
 					for blueprint_file in files:
 						if blueprint_file == '_intro_' or not blueprint_file.endswith('.txt'):
@@ -55,3 +58,13 @@ class BaseAction():
 			else:
 				raise ValueError(f'Unknown input {input}')
 		return input_files
+
+	@staticmethod
+	def blueprints(inputs, verbosity=0, should_ignore_corruption=False):
+		for filename in BaseAction.find_blueprints(input for input in inputs if not input.startswith('BLUEPRINT:')):
+			yield filename, Blueprint.read_from_file(filename, validate_hash = not should_ignore_corruption)
+		for input in inputs:
+			print(input)
+			if not input.startswith('BLUEPRINT:'):
+				continue
+			yield None, Blueprint.from_blueprint_string(input, validate_hash = not should_ignore_corruption)
