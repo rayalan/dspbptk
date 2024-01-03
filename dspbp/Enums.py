@@ -91,7 +91,9 @@ class Recipe(enum.IntEnum):
 	DeuteriumFractionation = 115
 	ReformingRefine = 121
 	LogisticsBot = 123
-
+	MagnumAmmoBox = 136,
+	TitaniumAmmoBox = 137,
+	TitaniumAlloyAmmoBox = 138,
 	ElectromagneticMatrix = 9
 	EnergyMatrix = 18
 	StructureMatrix = 27
@@ -228,6 +230,9 @@ class DysonSphereItem(enum.IntEnum):
 	ProliferatorMkI = 1141
 	ProliferatorMkII = 1142
 	ProliferatorMkIII = 1143
+	MagnumAmmoBox = 1601
+	TitaniumAmmoBox = 1602
+	TitaniumAlloyAmmoBox = 1603
 	ConveyorBeltMKI = 2001
 	ConveyorBeltMKII = 2002
 	ConveyorBeltMKIII = 2003
@@ -286,5 +291,6 @@ class DysonSphereItem(enum.IntEnum):
 	UniverseMatrix = 6006
 
 class LogisticsStationDirection(enum.IntEnum):
+	Unused = 0
 	Output = 1
 	Input = 2
