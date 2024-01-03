@@ -139,6 +139,7 @@ class Blueprint():
 			"timestamp": self._timestamp.strftime("%Y-%m-%d %H:%M:%S"),
 			"game_version": self._game_version,
 			"short_desc": self._short_desc,
+			"long_desc" : self._long_desc,
 			"data": self.decoded_data.to_dict(),
 		}
 
