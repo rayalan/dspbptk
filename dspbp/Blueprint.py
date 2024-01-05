@@ -124,9 +124,10 @@ class Blueprint():
 		components.append("0")
 		components.append(str(DateTimeTools.datetime_to_csharp(self._timestamp)))
 		components.append(self._game_version)
-		components.append(urllib.parse.quote(self._short_desc))
+		components.append(urllib.parse.quote(self._short_desc, safe=""))
+		components.append(urllib.parse.quote(self._long_desc, safe=""))
 		header = "BLUEPRINT:" + ",".join(components)
-		hashed_data = header + ",\"" + b64_data
+		hashed_data = header + "\"" + b64_data
 		hash_value = DysonSphereMD5(DysonSphereMD5.Variant.MD5F).update(hashed_data.encode("utf-8")).hexdigest()
 		return hashed_data + "\"" + hash_value.upper()
 
