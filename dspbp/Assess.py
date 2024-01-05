@@ -55,8 +55,8 @@ class Assessment:
 		inputs = ItemProduction()
 		outputs = ItemProduction()
 
-		self.defined_inputs = set([])
-		self.defined_outputs = set([])
+		self.imports = set([])
+		self.exports = set([])
 
 		for building in self.decoded_data.buildings:
 			item_type = maybeDysonSphereItem(building.data.item_id) or f'[{building.data.item_id}]'
@@ -81,25 +81,26 @@ class Assessment:
 					if not storage_id:
 						print(f'Unknown storage id {storage['item_id']}')
 						storage_id = f'u{storage['item_id']}'
-					if LogisticsStationDirection.Input in [storage['local_logic'], storage['remote_logic']]:
-						self.defined_inputs.add(storage_id)
-					if LogisticsStationDirection.Output in [storage['local_logic'], storage['remote_logic']]:
-						self.defined_outputs.add(storage_id)
+					if item_type == dsi.InterstellarLogisticsStation and LogisticsStationDirection.Input == storage['remote_logic']:
+						self.imports.add(storage_id)
+					elif LogisticsStationDirection.Input == storage['local_logic']:
+						self.imports.add(storage_id)
+					if item_type == dsi.InterstellarLogisticsStation and LogisticsStationDirection.Output == storage['remote_logic']:
+						self.exports.add(storage_id)
+					elif LogisticsStationDirection.Output == storage['local_logic']:
+						self.exports.add(storage_id)
 			elif item_type == dsi.LogisticsDistributor:
 				if building.data.filter_id:
 					item_id = maybeDysonSphereItem(building.data.filter_id or f'u{building.data.filter_id}')
 					if building.parameters.parameters.supply_logic == LogisticsStationDirection.Input:
-						self.defined_inputs.add(item_id)
+						self.imports.add(item_id)
 					elif building.parameters.parameters.supply_logic == LogisticsStationDirection.Output:
-						self.defined_outputs.add(item_id)
+						self.exports.add(item_id)
 
-		self.proliferate = dsi.ProliferatorMkIII if dsi.ProliferatorMkIII in self.defined_inputs \
-			else dsi.ProliferatorMkII if dsi.ProliferatorMkII in self.defined_inputs \
-			else dsi.ProliferatorMkI if dsi.ProliferatorMkI in self.defined_inputs \
+		self.proliferate = dsi.ProliferatorMkIII if dsi.ProliferatorMkIII in self.imports \
+			else dsi.ProliferatorMkII if dsi.ProliferatorMkII in self.imports \
+			else dsi.ProliferatorMkI if dsi.ProliferatorMkI in self.imports \
 			else None
-
-		print(self.building_counter)
-		print(self.building_recipe_counter)
 
 		for ((item_type_id, recipe_id), amount) in building_recipe_counter.most_common():
 			print(f'{item_type_id}, {recipe_id}, {amount}')
@@ -151,7 +152,11 @@ class SizeAssessment:
 		self.areas = blueprint_decoded_data._areas
 
 		if len(self.areas) > 1:
-			print(f'Warning: multiarea blueprints are not yet handled by {self.__class__}')
+			# Some debugging
+			print(f'Warning: multi-area blueprints are not yet handled by {self.__class__}')
+			print(f'    Found {len(self.areas)} areas...')
+			for area in self.areas:
+				print(f'   {area}')
 
 	def _height_scale(self):
 		primary_area = self.areas[0]
