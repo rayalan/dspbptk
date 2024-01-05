@@ -28,6 +28,7 @@ from ActionEdit import ActionEdit
 from ActionSearchUnknownIds import ActionSearchUnknownIds
 from ActionInspect import ActionInspect
 from ActionValidateSerialize import ActionValidateSerialize
+from ActionAnnotate import ActionAnnotate
 
 mc = MultiCommand()
 
@@ -38,5 +39,6 @@ ActionEdit.register(mc)
 ActionSearchUnknownIds.register(mc)
 ActionInspect.register(mc)
 ActionValidateSerialize.register(mc)
+ActionAnnotate.register(mc)
 
 mc.run(sys.argv[1:])
