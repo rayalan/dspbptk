@@ -221,6 +221,9 @@ class BlueprintArea():
 	def pack(self):
 		return self._BLUEPRINT_AREA.pack(self._fields._asdict())
 
+	def __str__(self):
+		return f'<area {self._fields.parent_index}.{self._fields.index}: {self._fields.width}x{self._fields.height} {self._fields.area_segments} segments, tropic {self._fields.tropic_anchor}>'
+
 	@classmethod
 	def deserialize(cls, data, offset):
 		fields = cls._BLUEPRINT_AREA.unpack_head(data, offset)
@@ -355,6 +358,7 @@ class BlueprintData():
 
 		areas = [ ]
 		offset = cls._HEADER.size
+
 		for area_id in range(header.area_count):
 			area = BlueprintArea.deserialize(data, offset)
 			offset += area.size
@@ -367,5 +371,8 @@ class BlueprintData():
 			building = BlueprintBuilding.deserialize(data, offset)
 			offset += building.size
 			buildings.append(building)
+
+		if len(data) != offset:
+			print(f'Data length is {len(data)} but {offset} bytes deserialized.')
 
 		return cls(header, areas, buildings)
