@@ -61,10 +61,11 @@ class BaseAction():
 
 	@staticmethod
 	def blueprints(inputs, verbosity=0, should_ignore_corruption=False):
-		for filename in BaseAction.find_blueprints(input for input in inputs if not input.startswith('BLUEPRINT:')):
+		# Capture all files so we don't grab more files as we rename them
+		blueprint_files = [filename for filename in BaseAction.find_blueprints(input for input in inputs if not input.startswith('BLUEPRINT:'))]
+		for filename in blueprint_files:
 			yield filename, Blueprint.read_from_file(filename, validate_hash = not should_ignore_corruption)
 		for input in inputs:
-			print(input)
 			if not input.startswith('BLUEPRINT:'):
 				continue
 			yield None, Blueprint.from_blueprint_string(input, validate_hash = not should_ignore_corruption)
