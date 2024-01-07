@@ -34,8 +34,7 @@ class BaseAction():
 	def register(cls, _):
 		raise NotImplementedError()
 
-	@staticmethod
-	def find_blueprints(inputs, verbosity=0):
+	def find_blueprints(self, inputs):
 		"""
 		Find all blueprint files given a list of files and/or directories
 
@@ -48,24 +47,36 @@ class BaseAction():
 				input_files.append(input)
 			elif os.path.isdir(input):
 				for root, _, files in os.walk(input):
-					if verbosity > 0:
+					if self._args.verbose > 0:
 						print(f'Searching {root}...')
 
 					for blueprint_file in files:
 						if blueprint_file == '_intro_' or not blueprint_file.endswith('.txt'):
 							continue
 						input_files.append(os.path.join(root, blueprint_file))
+					if not self._args.should_recurse:
+						break
 			else:
 				raise ValueError(f'Unknown input {input}')
 		return input_files
 
-	@staticmethod
-	def blueprints(inputs, verbosity=0, should_ignore_corruption=False):
+	def blueprints(self, inputs):
 		# Capture all files so we don't grab more files as we rename them
-		blueprint_files = [filename for filename in BaseAction.find_blueprints(input for input in inputs if not input.startswith('BLUEPRINT:'))]
+		blueprint_files = [filename for filename in self.find_blueprints(input for input in inputs if not input.startswith('BLUEPRINT:'))]
 		for filename in blueprint_files:
-			yield filename, Blueprint.read_from_file(filename, validate_hash = not should_ignore_corruption)
+			yield filename, Blueprint.read_from_file(filename, validate_hash = not self._args.ignore_corrupt)
 		for input in inputs:
 			if not input.startswith('BLUEPRINT:'):
 				continue
-			yield None, Blueprint.from_blueprint_string(input, validate_hash = not should_ignore_corruption)
+			yield None, Blueprint.from_blueprint_string(input, validate_hash = not self._args.ignore_corrupt)
+
+	@classmethod
+	def _genparser(cls, parser, is_single_file=False, is_folder_search=False):
+		if is_single_file and is_folder_search:
+			raise ValueError('Cannot use single file mode and folder search mode together')
+		parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
+		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
+		parser.add_argument("-n", "--dry-run", action="store_true", help="Only show what would be changed")
+		if is_folder_search:
+			parser.add_argument("--no-recurse", dest='should_recurse', action="store_false", help='Do not recurse ')
+			parser.add_argument("inputs", nargs = "+", help = "Input blueprint file(s) and/or directory(s)")

@@ -66,7 +66,7 @@ ICON_LAYOUT_MAP = {
 
 class ActionAnnotate(BaseAction):
 	def run(self):
-		for filename, bp in self.blueprints(self._args.inputs, self._args.verbose, self._args.ignore_corrupt):
+		for filename, bp in self.blueprints(self._args.inputs):
 			assessment = Assessment(bp)
 
 			tech_level = max(Machine.registry[item_id].tech_level if item_id in Machine.registry else 0 for item_id in assessment.building_counter)
@@ -232,10 +232,7 @@ class ActionAnnotate(BaseAction):
 	@classmethod
 	def register(cls, multicommand):
 		def genparser(parser):
-			parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
-			parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
-			parser.add_argument("-n", "--dry-run", action="store_true", help="Only show what would be changed")
-			parser.add_argument("inputs", nargs = "+", help = "Input blueprint file(s) and/or directory(s)")
+			cls._genparser(parser, is_folder_search=True)
 			parser.add_argument("-r", '--rename', action='store_true', help='Also rename blueprints')
 			parser.add_argument("-m", '--move', action='store_true', help='Also move blueprints')
 			parser.add_argument("-b", '--override-text', action='store_true', help='Override non-blank descriptions and icons')
