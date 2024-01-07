@@ -203,6 +203,7 @@ RECIPE_MAP = {
     Recipe.CasimirCrystalAdvanced: RecipeDetails({ dsi.OpticalGratingCrystal: 8, dsi.Graphene: 2, dsi.Hydrogen: 12}, { dsi.CasimirCrystal : 1}, 4),
     Recipe.PlaneFilter: RecipeDetails({ dsi.TitaniumGlass: 2, dsi.CasimirCrystal: 1}, { dsi.PlaneFilter : 1}, 12),
 
+    # Fuel
     Recipe.HydrogenFuelRod: RecipeDetails({ dsi.TitaniumIngot : 1, dsi.Hydrogen : 10}, { dsi.HydrogenFuelRod: 2 }, 6),
     Recipe.DeuteronFuelRod: RecipeDetails({ dsi.TitaniumAlloy : 1, dsi.SuperMagneticRing: 1, dsi.Deuterium : 20}, { dsi.DeuteronFuelRod: 2 }, 12),
     Recipe.AntimatterFuelRod: RecipeDetails({ dsi.TitaniumAlloy : 1, dsi.AnnihilationConstraintSphere: 1, dsi.Hydrogen : 12, dsi.Antimatter: 12}, { dsi.AntimatterFuelRod: 2 }, 24),
@@ -211,6 +212,11 @@ RECIPE_MAP = {
     Recipe.MagnumAmmoBox: RecipeDetails({ dsi.CopperIngot : 4}, { dsi.MagnumAmmoBox: 1 }, 1),
     Recipe.TitaniumAmmoBox: RecipeDetails({ dsi.TitaniumIngot : 2, dsi.MagnumAmmoBox: 1}, { dsi.TitaniumAmmoBox: 1 }, 2),
     Recipe.TitaniumAlloyAmmoBox: RecipeDetails({ dsi.TitaniumAlloy : 2, dsi.TitaniumAmmoBox: 1}, { dsi.TitaniumAlloyAmmoBox: 1 }, 3),
+
+    # Proliferation
+    Recipe.ProliferatorI: RecipeDetails({ dsi.Coal : 1}, { dsi.ProliferatorMkI: 1 }, .05),
+    Recipe.ProliferatorII: RecipeDetails({ dsi.ProliferatorMkI : 2, dsi.Diamond: 1}, { dsi.ProliferatorMkII: 1 }, 1),
+    Recipe.ProliferatorIII: RecipeDetails({ dsi.ProliferatorMkII : 2, dsi.CarbonNanotube: 1}, { dsi.ProliferatorMkIII: 1 }, 2),
 
     # Science
     Recipe.ElectromagneticMatrix: RecipeDetails({ dsi.CircuitBoard: 1, dsi.MagneticCoil : 1}, {dsi.ElectromagneticMatrix: 1}, 3),
@@ -249,5 +255,6 @@ RECIPE_MAP = {
     Recipe.Graphene: RecipeDetails({ dsi.EnergeticGraphite : 3, dsi.SulfuricAcid: 1 }, { dsi.Graphene: 2 }, 3),
     Recipe.GrapheneAdvanced: RecipeDetails({ dsi.FireIce : 2 }, { dsi.Graphene: 2, dsi.Hydrogen: 1 }, 2),
     Recipe.CarbonNanotube: RecipeDetails({ dsi.Graphene : 3, dsi.TitaniumIngot: 1 }, { dsi.CarbonNanotube: 2 }, 4),
+    Recipe.CarbonNanotubeAdvanced: RecipeDetails({ dsi.SpiniformStalagmiteCrystal : 6 }, { dsi.CarbonNanotube: 2 }, 4),
     Recipe.OrganicCrystal : RecipeDetails({ dsi.Plastic : 2, dsi.RefinedOil: 1, dsi.Water: 1}, { dsi.OrganicCrystal : 8}, 6),
 }
