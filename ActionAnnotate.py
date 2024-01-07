@@ -132,7 +132,8 @@ class ActionAnnotate(BaseAction):
 			icons = [advanced_recipe_icon, primary_production_building, assessment.proliferate]
 			icon_count = len([icon for icon in icons if icon])
 
-			bp._icon0 = primary_output_id
+			if primary_output_id:
+				bp._icon0 = primary_output_id
 			if icon_count == 0:
 				bp._layout = 10
 			elif icon_count == 1 and assessment.proliferate:
@@ -144,7 +145,7 @@ class ActionAnnotate(BaseAction):
 			else:
 				bp._layout = 32
 				bp._icon1 = advanced_recipe_icon or primary_production_building
-				bp._icon2 = proliferate or primary_production_building
+				bp._icon2 = assessment.proliferate or primary_production_building
 
 			final_icon_s = f'{bp._layout} ({ICON_LAYOUT_MAP.get(bp._layout,'?')}) -- {', '.join(str(icon) for icon in [bp._icon0, bp._icon1, bp._icon2, bp._icon3, bp._icon4])}'
 
@@ -176,6 +177,9 @@ class ActionAnnotate(BaseAction):
 			if ' of ' in filename:
 				print(f'Skipping annotation of {filename} as part of set')
 				continue
+			if not primary_output_id:
+				print(f'Skipping rename due to unknown file string')
+				should_rename = False
 
 			if short_description == bp.short_desc:
 				pass
