@@ -80,27 +80,7 @@ class ActionAnnotate(BaseAction):
 			for export_ in assessment.exports:
 				if export_ not in assessment.outputs:
 					additional_exports.append(export_)
-
-			if self._args.verbose:
-				print(f'Blueprint source: {filename}')
-				print(f'Unique building types: {len(assessment.building_counter)}, unique recipies: {len(assessment.recipe_counter)}')
-				print(f'Tech level: {tech_level}')
-				print(f'Area: {assessment.size_assessment} | {assessment.size_assessment.height_scale} | { assessment.size_assessment.sector_widths }')
-
-				print('Machine recap:')
-				for ((item_type_id, recipe_id), amount) in assessment.building_recipe_counter.most_common():
-					recipe = None if recipe_id == 0 else (maybeRecipe(recipe_id) or f'[{recipe_id} (recipe)]')
-					item_type = maybeDysonSphereItem(item_type_id) or f'[{building.data.item_id}]'
-					print("%5d  %25s %20s (%s)" % (amount, item_type.name, getattr(recipe, 'name', recipe), recipe))
-
-				if additional_imports:
-					print(f'Additional imports: {', '.join(import_.name for import_ in additional_imports)}')
-				if additional_exports:
-					print(f'Additional exports: {', '.join(export_.name for export_ in additional_exports)}')
-
 			primary_output_id = assessment.primary_output_id
-			if self._args.verbose:
-				print(f'Primary output: { primary_output_id.name if isinstance(primary_output_id, enum.IntEnum) else (primary_output_id or None) } @ {round(assessment.primary_output_amount,1)}/sec')
 
 			# Folder name is once of:
 			# - Science/Science - Type
@@ -122,8 +102,6 @@ class ActionAnnotate(BaseAction):
 				folder = os.path.join(blueprint_root,'Smelters')
 			else:
 				folder = os.path.join(blueprint_root,'Intermediate Products')
-			if self._args.verbose:
-				print(f'Folder: {folder}')
 
 			# Filename is: [PrimaryOutput] [Scale][Width][Proliferation]-[TechLevel]-[RecipeCount][AdvancedRecipies] [Quantity]
 			# where
@@ -147,12 +125,9 @@ class ActionAnnotate(BaseAction):
 				primary_production_building = [building.machine_id for building in primary_production_building if building][0]
 
 			short_description = f'{primary_output_id.name if hasattr(primary_output_id, 'name') else primary_output_id} {round(assessment.primary_output_amount,1):5}ips ({assessment.size_assessment.height_scale}{ assessment.size_assessment.sector_widths }{REPRESENTATION_MAP.get(assessment.proliferate, '')}-{REPRESENTATION_MAP.get(tech_level, '')}-{len(assessment.recipe_counter)}{'i' * advanced_recipe_count})'
-			if self._args.verbose:
-				print(short_description)
 
 			# Icons
-			if self._args.verbose:
-				print(f'Icon layout: {bp._layout} ({ICON_LAYOUT_MAP.get(bp._layout,'?')}) -- {', '.join(str(icon) for icon in [bp._icon0, bp._icon1, bp._icon2, bp._icon3, bp._icon4])}')
+			initial_icon_s = f'{bp._layout} ({ICON_LAYOUT_MAP.get(bp._layout,'?')}) -- {', '.join(str(icon) for icon in [bp._icon0, bp._icon1, bp._icon2, bp._icon3, bp._icon4])}'
 
 			icons = [advanced_recipe_icon, primary_production_building, assessment.proliferate]
 			icon_count = len([icon for icon in icons if icon])
@@ -171,8 +146,7 @@ class ActionAnnotate(BaseAction):
 				bp._icon1 = advanced_recipe_icon or primary_production_building
 				bp._icon2 = proliferate or primary_production_building
 
-			if self._args.verbose:
-				print(f'Updated Icon layout: {bp._layout} ({ICON_LAYOUT_MAP.get(bp._layout,'?')}) -- {', '.join(str(icon) for icon in [bp._icon0, bp._icon1, bp._icon2, bp._icon3, bp._icon4])}')
+			final_icon_s = f'{bp._layout} ({ICON_LAYOUT_MAP.get(bp._layout,'?')}) -- {', '.join(str(icon) for icon in [bp._icon0, bp._icon1, bp._icon2, bp._icon3, bp._icon4])}'
 
 			# Long description
 			pieces = []
@@ -186,9 +160,18 @@ class ActionAnnotate(BaseAction):
 				pieces.append(f'Additional exports: {', '.join(export_.name for export_ in additional_exports)}')
 
 			long_description = '\n'.join(pieces)
+
+			head, tail = os.path.split(filename)
+			final_name = f'{os.path.join(
+				folder if self._args.move else head,
+				f'{short_description}.txt' if self._args.rename else tail
+			)}'
+			should_rename = not os.path.exists(final_name) or not os.path.samefile(final_name, filename)
+
 			if self._args.verbose:
-				print(f'Long description:\n{long_description}\n---')
-				print()
+				print(f'>>> Blueprint source: {filename}')
+				print(f'Target folder: {folder}')
+				print(f'Final filename: {final_name} ({'will rename' if should_rename else 'no rename'})')
 
 			if ' of ' in filename:
 				print(f'Skipping annotation of {filename} as part of set')
@@ -199,7 +182,8 @@ class ActionAnnotate(BaseAction):
 			elif self._args.override_text or not bp.short_desc:
 				bp.short_desc = short_description
 			else:
-				print('Skipping short description rewrite')
+				if self._args.verbose:
+					print('Skipping short description rewrite')
 
 			if long_description == bp.long_desc:
 				pass
@@ -208,17 +192,32 @@ class ActionAnnotate(BaseAction):
 					print('Overwriting long description...')
 				bp.long_desc = long_description
 			else:
-				print('Skipping long description rewrite')
-
-			head, tail = os.path.split(filename)
-			final_name = f'{os.path.join(
-				folder if self._args.move else head,
-				short_description if self._args.rename else tail
-			)}.txt'
-			should_rename = not os.path.exists(final_name) or not os.path.samefile(final_name, filename)
+				if self._args.verbose:
+					print('Skipping long description rewrite')
 
 			if self._args.verbose:
-				print(f'Final filename: {final_name} ({'will rename' if should_rename else 'no rename'})')
+				print()
+				print(f'Primary output: { primary_output_id.name if isinstance(primary_output_id, enum.IntEnum) else (primary_output_id or None) } @ {round(assessment.primary_output_amount,1)}/sec')
+				print(f'Unique building types: {len(assessment.building_counter)}, unique recipies: {len(assessment.recipe_counter)}')
+				print(f'Tech level: {tech_level}')
+				print(f'Area: {assessment.size_assessment} | {assessment.size_assessment.height_scale} | { assessment.size_assessment.sector_widths }')
+
+				print(short_description)
+				if initial_icon_s == final_icon_s:
+					print(f'Icons: {initial_icon_s}')
+				else:
+					print(f'Icons: {initial_icon_s} --> {final_icon_s}')
+
+				print('Machine recap:')
+				for ((item_type_id, recipe_id), amount) in assessment.building_recipe_counter.most_common():
+					recipe = None if recipe_id == 0 else (maybeRecipe(recipe_id) or f'[{recipe_id} (recipe)]')
+					item_type = maybeDysonSphereItem(item_type_id) or f'[{building.data.item_id}]'
+					print("%5d  %25s %20s (%s)" % (amount, item_type.name, getattr(recipe, 'name', recipe), recipe))
+
+				print(f'Long description:\n{long_description}')
+
+				print(f'--- --- --- ---\n')
+
 			if self._args.dry_run:
 				continue
 
