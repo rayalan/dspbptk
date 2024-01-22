@@ -187,6 +187,7 @@ RECIPE_MAP = {
     Recipe.PhotonCombiner: RecipeDetails({ dsi.Prism : 2, dsi.CircuitBoard: 1 }, { dsi.PhotonCombiner: 1}, 3),
     Recipe.PhotonCombinerAdvanced: RecipeDetails({ dsi.OpticalGratingCrystal : 1, dsi.CircuitBoard: 1 }, { dsi.PhotonCombiner: 1}, 3),
 
+    Recipe.SolarSail: RecipeDetails({ dsi.PhotonCombiner: 1, dsi.Graphene : 1 }, { dsi.SolarSail : 2}, 4),
     Recipe.FrameMaterial: RecipeDetails({ dsi.CarbonNanotube : 4, dsi.TitaniumAlloy : 1, dsi.HighPuritySilicon: 1}, { dsi.FrameMaterial: 1 }, 6),
     Recipe.DysonSphereComponent: RecipeDetails({ dsi.FrameMaterial : 3, dsi.SolarSail : 3, dsi.Processor: 3},{ dsi.DysonSphereComponent: 1 }, 8),
     Recipe.SmallCarrierRocket: RecipeDetails({ dsi.DysonSphereComponent : 2, dsi.QuantumChip : 2, dsi.DeuteronFuelRod: 4},{ dsi.SmallCarrierRocket: 1 }, 6),
