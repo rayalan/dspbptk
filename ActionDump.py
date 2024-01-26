@@ -34,7 +34,7 @@ class ActionDump(BaseAction):
 
 			building_counter = collections.Counter()
 			for building in bpd.buildings:
-				building_counter[building.data.item_id] += 1
+				building_counter[(building.data.item_id, building.data.recipe_id)] += 1
 
 			if bp.short_desc != "":
 				print("Text          : %s" % (bp.short_desc))
@@ -43,13 +43,13 @@ class ActionDump(BaseAction):
 			if self._args.verbose >= 1:
 				print("Game version  : %s" % (bp.game_version))
 			print("Building count: %d" % (len(bpd.buildings)))
-			for (item_id, count) in building_counter.most_common():
+			for ((item_id, recipe_id), count) in building_counter.most_common():
 				try:
 					item = DysonSphereItem(item_id)
 					item_name = item.name
 				except ValueError:
 					item_name = f"[{item_id}]"
-				print("%5d  %s" % (count, item_name))
+				print("%5d  %s %s" % (count, item_name, recipe_id))
 			if len(self._args.infile) > 1:
 				print()
 	@classmethod
