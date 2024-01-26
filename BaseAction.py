@@ -80,3 +80,5 @@ class BaseAction():
 		if is_folder_search:
 			parser.add_argument("--no-recurse", dest='should_recurse', action="store_false", help='Do not recurse ')
 			parser.add_argument("inputs", nargs = "+", help = "Input blueprint file(s) and/or directory(s)")
+		if is_single_file:
+			parser.add_argument("infile", help = "Input blueprint text file (buildings will be replaced)")
