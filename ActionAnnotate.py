@@ -108,7 +108,8 @@ class ActionAnnotate(BaseAction):
 			if not primary_production_building:
 				primary_production_building = None
 			else:
-				primary_production_building = [building.machine_id for building in primary_production_building if building][0]
+				primary_production_building = [building.machine_id for building in primary_production_building if building]
+				primary_production_building = primary_production_building[0] if primary_production_building else None
 
 			short_description = f'{primary_output_id.name if hasattr(primary_output_id, 'name') else primary_output_id} {round(assessment.primary_output_amount,1):5}ips ({assessment.size_assessment.height_scale}{ assessment.size_assessment.sector_widths }{REPRESENTATION_MAP.get(assessment.proliferate, '')}-{REPRESENTATION_MAP.get(tech_level, '')}-{len(assessment.recipe_counter)}{'i' * advanced_recipe_count})'
 
