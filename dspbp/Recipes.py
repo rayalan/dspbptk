@@ -204,6 +204,9 @@ RECIPE_MAP = {
     Recipe.CasimirCrystalAdvanced: RecipeDetails({ dsi.OpticalGratingCrystal: 8, dsi.Graphene: 2, dsi.Hydrogen: 12}, { dsi.CasimirCrystal : 1}, 4),
     Recipe.PlaneFilter: RecipeDetails({ dsi.TitaniumGlass: 2, dsi.CasimirCrystal: 1}, { dsi.PlaneFilter : 1}, 12),
 
+    Recipe.Engine: RecipeDetails({dsi.MagneticCoil: 1, dsi.CopperIngot: 2}, {dsi.Engine: 1}, 3),
+    Recipe.Thruster: RecipeDetails({dsi.Steel: 2, dsi.CopperIngot: 3}, { dsi.Thruster: 1}, 4),
+
     # Fuel
     Recipe.HydrogenFuelRod: RecipeDetails({ dsi.TitaniumIngot : 1, dsi.Hydrogen : 10}, { dsi.HydrogenFuelRod: 2 }, 6),
     Recipe.DeuteronFuelRod: RecipeDetails({ dsi.TitaniumAlloy : 1, dsi.SuperMagneticRing: 1, dsi.Deuterium : 20}, { dsi.DeuteronFuelRod: 2 }, 12),
@@ -213,6 +216,13 @@ RECIPE_MAP = {
     Recipe.MagnumAmmoBox: RecipeDetails({ dsi.CopperIngot : 4}, { dsi.MagnumAmmoBox: 1 }, 1),
     Recipe.TitaniumAmmoBox: RecipeDetails({ dsi.TitaniumIngot : 2, dsi.MagnumAmmoBox: 1}, { dsi.TitaniumAmmoBox: 1 }, 2),
     Recipe.TitaniumAlloyAmmoBox: RecipeDetails({ dsi.TitaniumAlloy : 2, dsi.TitaniumAmmoBox: 1}, { dsi.TitaniumAlloyAmmoBox: 1 }, 3),
+    Recipe.CombustibleUnit: RecipeDetails({dsi.Coal:3}, {dsi.CombustibleUnit : 1}, 3),
+    Recipe.ExplosiveUnit: RecipeDetails({dsi.CombustibleUnit:2, dsi.SulfuricAcid: 1, dsi.Plastic: 2}, {dsi.ExplosiveUnit : 2}, 6),
+    Recipe.CrystalExplosiveUnit: RecipeDetails({dsi.ExplosiveUnit:8, dsi.CrystalSilicon:8, dsi.CasimirCrystal:1}, {dsi.CrystalExplosiveUnit : 8}, 24),
+    Recipe.MissileSet: RecipeDetails({ dsi.CopperIngot : 6, dsi.CircuitBoard: 3, dsi.CombustibleUnit: 2, dsi.Engine: 1}, { dsi.MissileSet: 1 }, 2),
+    Recipe.SupersonicMissileSet: RecipeDetails({ dsi.MissileSet : 2, dsi.Processor: 4, dsi.ExplosiveUnit: 4, dsi.Thruster: 2}, { dsi.SupersonicMissileSet: 2 }, 4),
+    Recipe.GravityMissileSet: RecipeDetails({ dsi.SupersonicMissileSet : 3, dsi.CrystalExplosiveUnit: 6, dsi.StrangeMatter: 3}, { dsi.GravityMissileSet: 3 }, 6),
+
 
     # Proliferation
     Recipe.ProliferatorI: RecipeDetails({ dsi.Coal : 1}, { dsi.ProliferatorMkI: 1 }, .05),

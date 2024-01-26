@@ -84,6 +84,7 @@ class Recipe(enum.IntEnum):
 	GravitonLens = 101
 	SuperMagneticRing = 103
 	StrangeMatter = 104
+	Engine = 105
 	ProliferatorI = 106
 	ProliferatorII = 107
 	ProliferatorIII = 108
@@ -91,9 +92,16 @@ class Recipe(enum.IntEnum):
 	DeuteriumFractionation = 115
 	ReformingRefine = 121
 	LogisticsBot = 123
-	MagnumAmmoBox = 136,
-	TitaniumAmmoBox = 137,
-	TitaniumAlloyAmmoBox = 138,
+	CombustibleUnit = 133
+	ExplosiveUnit = 134
+	CrystalExplosiveUnit = 135
+	MagnumAmmoBox = 136
+	TitaniumAmmoBox = 137
+	TitaniumAlloyAmmoBox = 138
+	MissileSet = 144
+	SupersonicMissileSet = 145
+	GravityMissileSet = 146
+
 	ElectromagneticMatrix = 9
 	EnergyMatrix = 18
 	StructureMatrix = 27
@@ -101,7 +109,7 @@ class Recipe(enum.IntEnum):
 	GravityMatrix = 102
 	UniverseMatrix = 75
 
-	AntiMatter = 74,  # "Mass-Energy Storage?!?"
+	AntiMatter = 74  # "Mass-Energy Storage?!?"
 
 	# Buildings
 	WindTurbine = 7
@@ -182,6 +190,9 @@ class DysonSphereItem(enum.IntEnum):
 	Prism = 1111
 	Diamond = 1112
 	CrystalSilicon = 1113
+	CombustibleUnit = 1128
+	ExplosiveUnit = 1129
+	CrystalExplosiveUnit = 1130
 	Gear = 1201
 	Magnet = 1102
 	MagneticCoil = 1202
@@ -233,6 +244,9 @@ class DysonSphereItem(enum.IntEnum):
 	MagnumAmmoBox = 1601
 	TitaniumAmmoBox = 1602
 	TitaniumAlloyAmmoBox = 1603
+	MissileSet = 1609
+	SupersonicMissileSet = 1610
+	GravityMissileSet = 1611
 	ConveyorBeltMKI = 2001
 	ConveyorBeltMKII = 2002
 	ConveyorBeltMKIII = 2003
@@ -289,6 +303,9 @@ class DysonSphereItem(enum.IntEnum):
 	InformationMatrix = 6004
 	GravityMatrix = 6005
 	UniverseMatrix = 6006
+
+	# Unknown item ids; replace with correct values
+	Engine = 98701
 
 class LogisticsStationDirection(enum.IntEnum):
 	Unused = 0
