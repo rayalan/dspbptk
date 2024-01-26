@@ -212,6 +212,9 @@ class ActionAnnotate(BaseAction):
 			if self._args.dry_run:
 				continue
 
+			true_folder = os.path.dirname(final_name)
+			if not os.path.exists(true_folder):
+				os.makedirs(true_folder)
 			bp.write_to_file(final_name)
 
 			if should_rename:
