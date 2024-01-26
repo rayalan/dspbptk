@@ -132,6 +132,9 @@ class Assessment:
 
 		self.primary_output_id, self.primary_output_amount = ItemProduction(self.outputs).primary_output
 		self.primary_output_id = maybeDysonSphereItem(self.primary_output_id) or self.primary_output_id
+	@property
+	def tech_level(self):
+		return max(Machine.registry[item_id].tech_level if item_id in Machine.registry else 0 for item_id in self.building_counter)
 
 
 class SizeAssessment:

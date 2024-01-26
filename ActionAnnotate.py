@@ -68,8 +68,7 @@ class ActionAnnotate(BaseAction):
 	def run(self):
 		for filename, bp in self.blueprints(self._args.inputs):
 			assessment = Assessment(bp)
-
-			tech_level = max(Machine.registry[item_id].tech_level if item_id in Machine.registry else 0 for item_id in assessment.building_counter)
+			tech_level = assessment.tech_level
 
 			additional_imports = []
 			for import_ in assessment.imports:
