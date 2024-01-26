@@ -160,6 +160,16 @@ class Recipe(enum.IntEnum):
 	TeslaTower = 8
 
 
+class ProductCategory(enum.Enum):
+	ScienceMatrix = 'Science'
+	Material = 'Materials'
+	Component = 'Components'
+	EndProduct = 'End Products'
+	Smelted = 'Smelters'
+	Proliferator = 'Proliferator'
+	Ammo = 'Ammo'
+
+
 class DysonSphereItem(enum.IntEnum):
 	Lava = -1
 

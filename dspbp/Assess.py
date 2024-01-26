@@ -18,10 +18,11 @@
 
 import collections
 import math
+import os
 
 from .Utils import maybeDysonSphereItem, maybeRecipe
-from .Enums import DysonSphereItem as dsi, LogisticsStationDirection
-from .Recipes import ItemProduction, RECIPE_MAP, Machine
+from .Enums import DysonSphereItem as dsi, LogisticsStationDirection, ProductCategory
+from .Recipes import ItemProduction, RECIPE_MAP, Machine, PRODUCT_CATEGORY_MAP
 
 Sector = collections.namedtuple("Sector", ['name', 'abbreviation', 'height', 'width'])
 
@@ -68,8 +69,6 @@ class Assessment:
 					recipe_counter[recipe_id] += 1
 				else:
 					print(f'Unknown recipe id {building.data.recipe_id}')
-
-
 
 			if item_type in [dsi.PlanetaryLogisticsStation, dsi.InterstellarLogisticsStation]:
 				for storage in building.parameters.storage:
