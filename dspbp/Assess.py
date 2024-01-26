@@ -102,7 +102,6 @@ class Assessment:
 			else None
 
 		for ((item_type_id, recipe_id), amount) in building_recipe_counter.most_common():
-			print(f'{item_type_id}, {recipe_id}, {amount}')
 			recipe = None if recipe_id == 0 else (maybeRecipe(recipe_id) or f'[{recipe_id} (recipe)]')
 			item_type = maybeDysonSphereItem(item_type_id) or f'[{building.data.item_id}]'
 			if recipe_id:
