@@ -26,7 +26,7 @@ from dspbp.Blueprint import Blueprint
 from dspbp.Enums import DysonSphereItem as dsi, Recipe
 from dspbp.Utils import maybeDysonSphereItem, maybeRecipe
 from dspbp.Recipes import ItemProduction, RECIPE_MAP, Machine
-from dspbp.Assess import Assessment
+from dspbp.Assess import Assessment, derive_destination_folder
 import dspbp.Recipes as Recipes
 
 REPRESENTATION_MAP = {
@@ -88,20 +88,7 @@ class ActionAnnotate(BaseAction):
 			# - Smelters
 			# - (anything else?)
 			# - Original location
-			folder = os.path.dirname(filename)
-			blueprint_root, sep, _ = folder.partition('Blueprint')
-			blueprint_root = blueprint_root + sep
-			if primary_output_id in [
-				dsi.ElectromagneticMatrix, dsi.EnergyMatrix, dsi.StructureMatrix, dsi.InformationMatrix, dsi.GravityMatrix,
-				dsi.UniverseMatrix]:
-				folder = os.path.join(blueprint_root,'Science', f'Science - {primary_output_id.name}')
-			elif primary_output_id in [
-				dsi.StoneBrick, dsi.Glass, dsi.IronIngot, dsi.Magnet, dsi.CopperIngot, dsi.TitaniumIngot,
-				dsi.TitaniumAlloy, dsi.CrystalSilicon, dsi.HighPuritySilicon, dsi.EnergeticGraphite, dsi.Diamond,
-				]:
-				folder = os.path.join(blueprint_root,'Smelters')
-			else:
-				folder = os.path.join(blueprint_root,'Intermediate Products')
+			folder = derive_destination_folder(filename, assessment)
 
 			# Filename is: [PrimaryOutput] [Scale][Width][Proliferation]-[TechLevel]-[RecipeCount][AdvancedRecipies] [Quantity]
 			# where

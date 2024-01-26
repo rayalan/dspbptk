@@ -191,3 +191,26 @@ class SizeAssessment:
 			s.append(f'{sector.name}')
 
 		return f'placement: {', '.join(s)}  -- ({width}x{height})'
+
+
+def derive_destination_folder(filename, assessment):
+	folder = os.path.dirname(filename)
+	blueprint_root, sep, _ = folder.partition('Blueprint')
+	blueprint_root = blueprint_root + sep
+	category = PRODUCT_CATEGORY_MAP.get(assessment.primary_output_id)
+
+	# Don't move things that don't produce known items.
+	if not category:
+		return folder
+
+	# Science always goes in the same folder
+	if category == ProductCategory.ScienceMatrix:
+		return os.path.join(blueprint_root,category.value, f'{category.value} - {assessment.primary_output_id.name}')
+
+	# Any product production without a PLS/ILS and a low tech level is probably an early game aide.
+	if dsi.PlanetaryLogisticsStation not in assessment.building_counter \
+		and dsi.InterstellarLogisticsStation not in assessment.building_counter \
+		and assessment.tech_level <= 3:
+		return os.path.join(blueprint_root, 'Bootstrap')
+
+	return os.path.join(blueprint_root, category.value)
