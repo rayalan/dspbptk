@@ -321,3 +321,7 @@ class LogisticsStationDirection(enum.IntEnum):
 	Unused = 0
 	Output = 1
 	Input = 2
+
+class ProliferationEffect(enum.IntEnum):
+	Product = 0
+	Speedup = 1

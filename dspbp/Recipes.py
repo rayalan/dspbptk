@@ -18,7 +18,7 @@
 import collections
 import enum
 
-from .Enums import Recipe, DysonSphereItem as dsi, ProductCategory
+from .Enums import Recipe, DysonSphereItem as dsi, ProductCategory, ProliferationEffect
 
 
 class Machine:
@@ -62,6 +62,12 @@ PROLIFERATION_PRODUCT_MULTIPLIERS = {
     dsi.ProliferatorMkI : 1.125,
 }
 
+PROLIFERATION_PRODUCT_SPEEDUP = {
+    dsi.ProliferatorMkIII : 2,
+    dsi.ProliferatorMkII : 1.5,
+    dsi.ProliferatorMkI : 1.25,
+}
+
 def get_production_multiple(machine):
     try:
         return Machine.registry[machine].production_multiplier
@@ -82,7 +88,7 @@ class RecipeDetails:
         self.outputs = outputs
         self.period = period
 
-    def calculate_outputs(self, machines, proliferate=None):
+    def calculate_outputs(self, machines, proliferate=None, proliferation_effect=None):
         """
         Takes in integer or map of machines to machine count
         """
@@ -92,8 +98,10 @@ class RecipeDetails:
                 get_production_multiple(machine) * machine_count for machine, machine_count in machines.items()
                 )
         production_multiple /= self.period
+
+        effect_map = PROLIFERATION_PRODUCT_SPEEDUP if proliferation_effect == ProliferationEffect.Speedup else PROLIFERATION_PRODUCT_MULTIPLIERS
         try:
-            production_multiple *= PROLIFERATION_PRODUCT_MULTIPLIERS[proliferate] if isinstance(proliferate, enum.IntEnum) \
+            production_multiple *= effect_map[proliferate] if isinstance(proliferate, enum.IntEnum) \
                 else proliferate if isinstance(proliferate, int) \
                 else 1
         except KeyError:
@@ -101,10 +109,13 @@ class RecipeDetails:
         return {
             product : items * production_multiple for product, items in self.outputs.items()
         }
-    def calculate_inputs(self, machines):
+
+    def calculate_inputs(self, machines, proliferate, proliferation_effect=None):
         production_multiple = machines
+
         if not isinstance(machines, int):
             production_multiple = sum(get_production_multiple(machine) * machine_count for machine, machine_count in machines.items())
+        production_multiple *= PROLIFERATION_PRODUCT_SPEEDUP[proliferate] if proliferate and proliferation_effect == ProliferationEffect.Speedup else 1
         production_multiple /= self.period
         return {
             product : items * production_multiple for product, items in self.inputs.items()

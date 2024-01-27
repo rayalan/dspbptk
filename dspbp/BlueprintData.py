@@ -22,7 +22,8 @@ import collections
 import enum
 
 from .NamedStruct import NamedStruct
-from .Enums import DysonSphereItem, LogisticsStationDirection
+from .Enums import DysonSphereItem, LogisticsStationDirection, ProliferationEffect
+from .Enums import DysonSphereItem as dsi
 
 PLANETARY_LOGISTICS_STATION_STORAGE_SIZE = 4
 INTERSTELLAR_LOGISTICS_STATION_STORAGE_SIZE = 5
@@ -81,6 +82,28 @@ class LogisticsDistributorParameters(CustomizedParameters):
 	@property
 	def parameters(self):
 		return self._parameters
+
+
+class ProductionBuildingParameters(CustomizedParameters):
+	_Parameters = collections.namedtuple('Parameters', [ 'proliferation_effect'])
+	__PARAMETER_KEY_OFFSETS = {
+		'proliferation_effect' : 0,
+	}
+	__PARAMETER_CONVERTERS = {
+		'proliferation_effect' : ProliferationEffect
+	}
+	def __init__(self, parameters):
+		super().__init__(parameters)
+		self._parameters = self._Parameters(**{
+			key : self.__PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self.__PARAMETER_KEY_OFFSETS.items()
+		})
+
+	@property
+	def parameters(self):
+		return self._parameters
+
+	def to_dict(self):
+		return self.parameters._asdict()
 
 
 class StationParameters(CustomizedParameters):
@@ -283,6 +306,8 @@ class BlueprintBuilding():
 			return StationParameters(self._parameters, storage_len = INTERSTELLAR_LOGISTICS_STATION_STORAGE_SIZE, slots_len = 12)
 		elif self.item == DysonSphereItem.LogisticsDistributor:
 			return LogisticsDistributorParameters(self._parameters)
+		elif self.item in [dsi.ChemicalPlant]:
+			return ProductionBuildingParameters(self._parameters)
 		return self._parameters
 
 	@property

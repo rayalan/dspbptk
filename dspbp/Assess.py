@@ -35,6 +35,7 @@ class Assessment:
 		building_counter = collections.Counter()
 		recipe_counter = collections.Counter()
 		building_recipe_counter = collections.Counter()
+		recipe_proliferation_effects = {}
 		self.building_counter = building_counter
 		self.recipe_counter = recipe_counter
 		self.building_recipe_counter = building_recipe_counter
@@ -69,6 +70,9 @@ class Assessment:
 					recipe_counter[recipe_id] += 1
 				else:
 					print(f'Unknown recipe id {building.data.recipe_id}')
+
+				# Assume we aren't mixing and matching proliferation effects for the same recipe
+				recipe_proliferation_effects[recipe_id] = building.parameters.parameters.proliferation_effect
 
 			if item_type in [dsi.PlanetaryLogisticsStation, dsi.InterstellarLogisticsStation]:
 				for storage in building.parameters.storage:
@@ -107,8 +111,8 @@ class Assessment:
 			if recipe_id:
 				if recipe_id in RECIPE_MAP:
 					recipe_production = RECIPE_MAP[recipe_id]
-					inputs -= ItemProduction(recipe_production.calculate_inputs({ item_type : amount }))
-					outputs += ItemProduction(recipe_production.calculate_outputs({ item_type : amount }, self.proliferate))
+					inputs -= ItemProduction(recipe_production.calculate_inputs({ item_type : amount }, self.proliferate, recipe_proliferation_effects[recipe_id]))
+					outputs += ItemProduction(recipe_production.calculate_outputs({ item_type : amount }, self.proliferate, recipe_proliferation_effects[recipe_id]))
 				else:
 					print(f'\tRecipe {recipe.name} has no production information')
 
