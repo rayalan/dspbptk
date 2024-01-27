@@ -5,8 +5,32 @@ Blueprint toolkit. Dyson Sphere Program is an *amazing* factory-building game
 by the incredibly talented indie-dev [Youthcat Studio](https://twitter.com/dysonprogram).
 It allows blueprinting files to disk and then reusing them in other parts of your game.
 
+# What does it do?
+
+* Describes blueprints
+* Edit a blueprint (in progress)
+  * Upgrade sorters, belts, and production buildings.
+  * Transpose blueprints (e.g. Iron ingot smelting to Copper ore smelting)
+  * Tweak settings such as logistics station storage limits or proliferation mode.
+  * Center blueprints on logistics stations or other POI
+* Convert a blueprint to JSON
+* Replace existing blueprint with new build
+* Sort blueprints into folders based on output production
+* Watches clipboards and blueprint direction for changes
+* Automatically apply annotations, upgrades, or transpositions on changed blueprints (in progress)
+* Command line interface
+* Graphical user interface  (in progress)
+* Extendable framework for editing blueprint (see ActionEdit)
+* Extendable framework for rendering/inspecting blueprints
+* Fast to use
+  * Automatically determine best blueprint match for edit/replacement operations
+  * Read and write clipboard for applicable operations
+
+See `./dspbptk --help` for a list of all commands and arguments.
+
 # How to use it
 
+## Basic setup
 ```
 git clone https://github.com/rayalan/dspbptk.git
 cd dspbptk
@@ -15,27 +39,44 @@ cd dspbptk
 ./dpsbptk bp2json path/to/blueprint example.json
 cat example.json
 ```
-# What does it do?
 
-* Summarizes blueprints
-* Convert a blueprint to JSON
-* Edit a blueprint (in progress)
-* Extendable framework for editing blueprint (see ActionEdit)
-* Extendable framework for rendering/inspecting blueprints
+## Clipboard
+
+Optional clipboard support is available:
+
+```
+pip3 install pyperclip  # Optional support for clipboard
+```
+
+When the clipboard is installed, blueprint inputs can be read from the clipboard. For example:
+
+```
+./dspbptk annotate
+```
+
+will read the blueprint from the clipboard, annotate it, and save it in the appropriate location.
+
+## Graphical User Interface (in progress)
+
+TBD
+
+## File watch (in progress)
+
+TBD
 
 # For developers
 
 ## inspect
 
-The inspect command is a sandbox command for exploring the data.
+The `inspect` command is a sandbox command for exploring the data.
 
 ## search-new-ids
 
-DysonSphereProgram adds new items (e.g. recipes, buildings) periodically. This command scans blueprints for unknown ids to facilitate finding and updating the enumerated ids.
+DysonSphereProgram adds new items (e.g. recipes, buildings) periodically. The `search-new-ids` command scans blueprints for unknown ids to facilitate finding and updating the enumerated ids.
 
 ## validate-serialize
 
-This command tries to re-serialize all blueprints and ensures that the original matches byte-for-byte. Useful for validating any serialization changes.
+The `validate-serialize` command tries to re-serialize all blueprints and ensures that the original matches byte-for-byte. Useful for validating any serialization changes.
 
 # Background
 
