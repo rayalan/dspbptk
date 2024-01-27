@@ -22,6 +22,8 @@ import math
 import os
 
 from BaseAction import BaseAction
+import envshim
+
 from dspbp.Blueprint import Blueprint
 from dspbp.Enums import DysonSphereItem as dsi, Recipe
 from dspbp.Utils import maybeDysonSphereItem, maybeRecipe
@@ -87,7 +89,7 @@ class ActionAnnotate(BaseAction):
 			# - Smelters
 			# - (anything else?)
 			# - Original location
-			folder = derive_destination_folder(filename, assessment)
+			folder = derive_destination_folder(filename or envshim.ENV['root'], assessment)
 
 			# Filename is: [PrimaryOutput] [Scale][Width][Proliferation]-[TechLevel]-[RecipeCount][AdvancedRecipies] [Quantity]
 			# where

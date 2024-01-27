@@ -20,11 +20,26 @@
 import os
 
 from dspbp.Blueprint import Blueprint
+import envshim
+
+
+def _is_blueprint(input):
+	return input.startswith('BLUEPRINT:')
+
+def _input_to_path(input):
+	if os.path.exists(input):
+		return input
+	alternate_input = os.path.join(envshim.ENV['root'], input)
+	if os.path.exists(alternate_input):
+		return alternate_input
+	print(f'Unable to locate `{input}`')
+	return input  # Should this error?
 
 class BaseAction():
 	def __init__(self, cmdname, args):
 		self._cmd = cmdname
 		self._args = args
+		envshim.load_env()
 		self.run()
 
 	def run(self):
@@ -62,23 +77,32 @@ class BaseAction():
 
 	def blueprints(self, inputs):
 		# Capture all files so we don't grab more files as we rename them
-		blueprint_files = [filename for filename in self.find_blueprints(input for input in inputs if not input.startswith('BLUEPRINT:'))]
+		blueprint_files = [filename for filename in self.find_blueprints(_input_to_path(input) for input in inputs if input and not _is_blueprint(input))]
 		for filename in blueprint_files:
 			yield filename, Blueprint.read_from_file(filename, validate_hash = not self._args.ignore_corrupt)
 		for input in inputs:
-			if not input.startswith('BLUEPRINT:'):
+			if not input or not input.startswith('BLUEPRINT:'):
 				continue
 			yield None, Blueprint.from_blueprint_string(input, validate_hash = not self._args.ignore_corrupt)
+		try:
+			import pyperclip
+			maybe_blueprint = pyperclip.paste()
+			if _is_blueprint(maybe_blueprint):
+				yield None, Blueprint.from_blueprint_string(maybe_blueprint, validate_hash = not self._args.ignore_corrupt)
+		except ImportError:
+			pass
+
 
 	@classmethod
 	def _genparser(cls, parser, is_single_file=False, is_folder_search=False):
 		if is_single_file and is_folder_search:
-			raise ValueError('Cannot use single file mode and folder search mode together')
-		parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
+			raise ValueError('Cannot use single file mode and folder search mode together.')
+		if is_single_file or is_folder_search:
+			parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
 		parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
 		parser.add_argument("-n", "--dry-run", action="store_true", help="Only show what would be changed")
 		if is_folder_search:
 			parser.add_argument("--no-recurse", dest='should_recurse', action="store_false", help='Do not recurse ')
-			parser.add_argument("inputs", nargs = "+", help = "Input blueprint file(s) and/or directory(s)")
+			parser.add_argument("inputs", nargs = "*", help = "Input blueprint file(s) and/or directory(s)")
 		if is_single_file:
-			parser.add_argument("infile", help = "Input blueprint text file (buildings will be replaced)")
+			parser.add_argument("infile", nargs = '?', help = "Input blueprint text file (buildings will be replaced)")

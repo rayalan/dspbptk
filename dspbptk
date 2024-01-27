@@ -30,6 +30,7 @@ from ActionInspect import ActionInspect
 from ActionValidateSerialize import ActionValidateSerialize
 from ActionAnnotate import ActionAnnotate
 from ActionReplace import ActionReplace
+from ActionEnv import ActionEnv
 
 mc = MultiCommand()
 
@@ -42,5 +43,6 @@ ActionInspect.register(mc)
 ActionValidateSerialize.register(mc)
 ActionAnnotate.register(mc)
 ActionReplace.register(mc)
+ActionEnv.register(mc)
 
 mc.run(sys.argv[1:])
