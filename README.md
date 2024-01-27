@@ -40,6 +40,15 @@ cd dspbptk
 cat example.json
 ```
 
+## Environment
+
+By default, the dspbptk expects either a full path, or it will look for relative to `~/Dyson Sphere Program/Blueprint`. The root blueprint location can be set via the `env` command:
+
+```
+./dspbptk env  # Show the current environment
+./dspbptk root:path/to/blueprints  # Set the root location
+```
+
 ## Clipboard
 
 Optional clipboard support is available:
