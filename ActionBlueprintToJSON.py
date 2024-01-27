@@ -25,27 +25,27 @@ from dspbp.Blueprint import Blueprint
 
 class ActionBlueprintToJSON(BaseAction):
 	def run(self):
-		if (not self._args.force) and os.path.exists(self._args.outfile):
+		if (not self._args.force) and self._args.outfile and os.path.exists(self._args.outfile):
 			print("Refusing to overwrite: %s" % (self._args.outfile))
 			return 1
 
-		bp = Blueprint.read_from_file(self._args.infile, validate_hash = not self._args.ignore_corrupt)
+		_, bp = next(self.blueprints([self._args.infile]))
 		bp_dict = bp.to_dict()
 
-		with open(self._args.outfile, "w") as f:
-			if self._args.pretty_print:
-				json.dump(bp_dict, f, indent = 4, sort_keys = True)
-				f.write("\n")
-			else:
-				json.dump(bp_dict, f)
+		if self._args.outfile:
+			with open(self._args.outfile, "w") as f:
+				if self._args.pretty_print:
+					json.dump(bp_dict, f, indent = 4, sort_keys = True)
+					f.write("\n")
+				else:
+					json.dump(bp_dict, f)
+		print(json.dumps(bp_dict, indent=4))
 
 	@classmethod
 	def register(cls, multicommand):
 		def genparser(parser):
+			cls._genparser(parser, is_single_file=True)
 			parser.add_argument("-f", "--force", action = "store_true", help = "Overwrite output file if it exists.")
 			parser.add_argument("-p", "--pretty-print", action = "store_true", help = "Create a pretty-printed output JSON file.")
-			parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
-			parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
-			parser.add_argument("infile", help = "Input blueprint text file")
-			parser.add_argument("outfile", help = "Output JSON file")
+			parser.add_argument("outfile", nargs='?', help = "Output JSON file")
 		multicommand.register("bp2json", "Convert a blueprint to JSON", genparser, action = ActionBlueprintToJSON)

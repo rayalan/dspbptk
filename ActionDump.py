@@ -26,10 +26,9 @@ from dspbp.Enums import DysonSphereItem
 
 class ActionDump(BaseAction):
 	def run(self):
-		for filename in self._args.infile:
-			if len(self._args.infile) > 1:
+		for filename, bp in self.blueprints(self._args.inputs):
+			if len(self._args.inputs) > 1:
 				print(f"{filename}:")
-			bp = Blueprint.read_from_file(filename, validate_hash = not self._args.ignore_corrupt)
 			bpd = bp.decoded_data
 
 			building_counter = collections.Counter()
@@ -50,12 +49,11 @@ class ActionDump(BaseAction):
 				except ValueError:
 					item_name = f"[{item_id}]"
 				print("%5d  %s %s" % (count, item_name, recipe_id))
-			if len(self._args.infile) > 1:
+			if len(self._args.inputs) > 1:
 				print()
+
 	@classmethod
 	def register(cls, multicommand):
 		def genparser(parser):
-			parser.add_argument("--ignore-corrupt", action = "store_true", help = "Do not validate the checksum when reading the blueprint file.")
-			parser.add_argument("-v", "--verbose", action = "count", default = 0, help = "Increase verbosity.")
-			parser.add_argument("infile", nargs = "+", help = "Input blueprint text file(s)")
-		multicommand.register("dump", "Dump some information about a blueprint", genparser, action = cls)
+			cls._genparser(parser, is_folder_search=True)
+		multicommand.register("dump", "Dump some information about blueprint(s)", genparser, action = cls)

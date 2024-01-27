@@ -195,7 +195,7 @@ class SizeAssessment:
 
 
 def derive_destination_folder(filename, assessment):
-	folder = os.path.dirname(filename)
+	folder = os.path.dirname(filename) if os.path.isfile(filename) else filename
 	blueprint_root, sep, _ = folder.partition('Blueprint')
 	blueprint_root = blueprint_root + sep
 	category = PRODUCT_CATEGORY_MAP.get(assessment.primary_output_id)
