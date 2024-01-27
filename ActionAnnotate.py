@@ -151,10 +151,10 @@ class ActionAnnotate(BaseAction):
 
 			long_description = '\n'.join(pieces)
 
-			head, tail = os.path.split(filename)
+			head, tail = os.path.split(filename) if filename else ('', '')
 			final_name = f'{os.path.join(
-				folder if self._args.move else head,
-				f'{short_description}.txt' if self._args.rename else tail
+				folder if (self._args.move or not filename) else head,
+				f'{short_description}.txt' if (self._args.rename or not filename) else tail
 			)}'
 			should_rename = not os.path.exists(final_name) or not os.path.samefile(final_name, filename)
 
@@ -163,7 +163,7 @@ class ActionAnnotate(BaseAction):
 				print(f'Target folder: {folder}')
 				print(f'Final filename: {final_name} ({'will rename' if should_rename else 'no rename'})')
 
-			if ' of ' in filename:
+			if filename and ' of ' in filename:
 				print(f'Skipping annotation of {filename} as part of set')
 				continue
 			if not primary_output_id:
@@ -219,7 +219,7 @@ class ActionAnnotate(BaseAction):
 				os.makedirs(true_folder)
 			bp.write_to_file(final_name)
 
-			if should_rename:
+			if should_rename and filename:
 				if self._args.verbose:
 					print(f'Removing {filename}...')
 				os.remove(filename)
