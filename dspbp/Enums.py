@@ -325,3 +325,17 @@ class LogisticsStationDirection(enum.IntEnum):
 class ProliferationEffect(enum.IntEnum):
 	Product = 0
 	Speedup = 1
+
+# Ideally, automatically generate this list from recipes or something
+PRODUCTION_MACHINES = [
+	DysonSphereItem.AssemblingMachineMkI,
+	DysonSphereItem.AssemblingMachineMkII,
+	DysonSphereItem.AssemblingMachineMkIII,
+	DysonSphereItem.ChemicalPlant,
+	DysonSphereItem.QuantumChemicalPlant,
+	DysonSphereItem.ArcSmelter,
+	DysonSphereItem.PlaneSmelter,
+	DysonSphereItem.MatrixLab,
+	DysonSphereItem.MiniatureParticleCollider,
+	DysonSphereItem.OilRefinery,
+	]

@@ -23,7 +23,7 @@ import enum
 
 from .NamedStruct import NamedStruct
 from .Enums import DysonSphereItem, LogisticsStationDirection, ProliferationEffect
-from .Enums import DysonSphereItem as dsi
+from .Enums import DysonSphereItem as dsi, PRODUCTION_MACHINES
 
 PLANETARY_LOGISTICS_STATION_STORAGE_SIZE = 4
 INTERSTELLAR_LOGISTICS_STATION_STORAGE_SIZE = 5
@@ -306,7 +306,7 @@ class BlueprintBuilding():
 			return StationParameters(self._parameters, storage_len = INTERSTELLAR_LOGISTICS_STATION_STORAGE_SIZE, slots_len = 12)
 		elif self.item == DysonSphereItem.LogisticsDistributor:
 			return LogisticsDistributorParameters(self._parameters)
-		elif self.item in [dsi.ChemicalPlant]:
+		elif self.item in PRODUCTION_MACHINES:
 			return ProductionBuildingParameters(self._parameters)
 		return self._parameters
 
