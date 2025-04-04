@@ -84,13 +84,14 @@ class BaseAction():
 			if not input or not input.startswith('BLUEPRINT:'):
 				continue
 			yield None, Blueprint.from_blueprint_string(input, validate_hash = not self._args.ignore_corrupt)
-		try:
-			import pyperclip
-			maybe_blueprint = pyperclip.paste()
-			if _is_blueprint(maybe_blueprint):
-				yield None, Blueprint.from_blueprint_string(maybe_blueprint, validate_hash = not self._args.ignore_corrupt)
-		except ImportError:
-			pass
+		if not inputs:
+			try:
+				import pyperclip
+				maybe_blueprint = pyperclip.paste()
+				if _is_blueprint(maybe_blueprint):
+					yield None, Blueprint.from_blueprint_string(maybe_blueprint, validate_hash = not self._args.ignore_corrupt)
+			except ImportError:
+				pass
 
 
 	@classmethod
