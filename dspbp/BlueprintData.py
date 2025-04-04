@@ -207,6 +207,14 @@ class StationParameters(CustomizedParameters):
 			mapping[self._PARAMETERS_OFFSET + offset] = getattr(self.parameters, key)
 		return mapping
 
+	def set_storage(self, storage_ix, key, value):
+		if storage_ix >= len(self.storage):
+			raise ValueError(f'Storage {storage_ix} exceeds storage allocation')
+		offset = self._STORAGE_OFFSET + (6 * storage_ix) + self._STORAGE_KEY_OFFSETS[key]
+		self._raw_parameters[offset] = value
+		# self.storage[storage_ix][key] = value
+		# print(f'Storage is now: {self.storage[storage_ix]}')
+
 	def _parse_storage(self, parameters, storage_len):
 		storage = [ ]
 		for offset in range(self._STORAGE_OFFSET, self._STORAGE_OFFSET + (6 * storage_len), 6):
