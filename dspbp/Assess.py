@@ -21,7 +21,7 @@ import math
 import os
 
 from .Utils import maybeDysonSphereItem, maybeRecipe
-from .Enums import DysonSphereItem as dsi, LogisticsStationDirection, ProductCategory
+from .Enums import DysonSphereItem as dsi, LogisticsStationDirection, ProductCategory, ProliferationEffect
 from .Recipes import ItemProduction, RECIPE_MAP, Machine, PRODUCT_CATEGORY_MAP
 
 Sector = collections.namedtuple("Sector", ['name', 'abbreviation', 'height', 'width'])
@@ -73,6 +73,9 @@ class Assessment:
 
 				# Assume we aren't mixing and matching proliferation effects for the same recipe
 				recipe_proliferation_effects[recipe_id] = building.parameters.parameters.proliferation_effect
+				# Hack until we fix parameters for Matrix labs
+				if item_type == dsi.MatrixLab:
+					recipe_proliferation_effects[recipe_id] = ProliferationEffect.Product
 
 			if item_type in [dsi.PlanetaryLogisticsStation, dsi.InterstellarLogisticsStation]:
 				for storage in building.parameters.storage:
@@ -83,7 +86,7 @@ class Assessment:
 					storage_id = maybeDysonSphereItem(storage['item_id'])
 					if not storage_id:
 						print(f'Unknown storage id {storage['item_id']}')
-						storage_id = f'u{storage['item_id']}'
+						storage_id = f'u<{storage['item_id']}>'
 					if item_type == dsi.InterstellarLogisticsStation and LogisticsStationDirection.Input == storage['remote_logic']:
 						self.imports.add(storage_id)
 					elif LogisticsStationDirection.Input == storage['local_logic']:
