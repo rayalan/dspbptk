@@ -136,9 +136,20 @@ class ProductionBuildingParameters(CustomizedParameters):
 	}
 	def __init__(self, parameters):
 		super().__init__(parameters)
-		self._parameters = self._Parameters(**{
-			key : self._PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self._PARAMETER_KEY_OFFSETS.items()
-		})
+		try:
+			self._parameters = self._Parameters(**{
+				key : self._PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self._PARAMETER_KEY_OFFSETS.items()
+				})
+		# Sometimes we get an empty list here...not clear why. As a placeholder, just give a fake value.
+		# Eventually, we need to track down the source of this issue.
+		except IndexError:
+			parameters = [ProliferationEffect.Product]
+			self._parameters = self._Parameters(**{
+				key : self._PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self._PARAMETER_KEY_OFFSETS.items()
+				})
+		except Exception:
+			print(f'Parameters: {parameters}')
+			raise
 
 	@property
 	def parameters(self):
