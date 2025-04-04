@@ -98,14 +98,42 @@ class Recipe(enum.IntEnum):
 	MagnumAmmoBox = 136
 	TitaniumAmmoBox = 137
 	TitaniumAlloyAmmoBox = 138
+	ShellSet = 139
+	HighExplosiveShellSet = 140
+	CrystalShellSet = 141
+	PlasmaCapsule = 142
+	AntimatterCapsule = 143
 	MissileSet = 144
 	SupersonicMissileSet = 145
 	GravityMissileSet = 146
+	Prototype = 147
+	PrecisionDrone = 148
+	AttackDrone = 149
+	Corvette = 150
+	Destroyer = 151
+	StrangeResarch = 153
+	StrangeAssembler = 154
+	StrangeSmelter = 155
+	StrangeAnnhilationFuelRod = 156
+	JammingCapsule = 158
+	SuppressingCapsule = 159
+	SorterPile = 160
+
+	GaussTurret = 125
+	LaserTurret = 126
+	ImplosionCannon = 127
+	PlasmaTurret = 128
+	MissileTurret = 129
+	JammingTower = 130
+	SignalTower = 131
+	SRPlasmaTurret = 157
+	BattlefieldAnalysisBase = 152
+	PlanetaryShieldGenerator = 132
 
 	ElectromagneticMatrix = 9
 	EnergyMatrix = 18
 	StructureMatrix = 27
-	InformationMatricx = 55
+	InformationMatrix = 55
 	GravityMatrix = 102
 	UniverseMatrix = 75
 
@@ -171,8 +199,7 @@ class ProductCategory(enum.Enum):
 
 
 class DysonSphereItem(enum.IntEnum):
-	Lava = -1
-
+	# Lava = -1
 	IronOre = 1001
 	CopperOre = 1002
 	SiliconOre = 1003
@@ -231,6 +258,7 @@ class DysonSphereItem(enum.IntEnum):
 	HydrogenFuelRod = 1801
 	DeuteronFuelRod = 1802
 	AntimatterFuelRod = 1803
+	StrangeAnnhilationFuelRod = 1804
 	Plastic = 1115
 	Graphene = 1123
 	CarbonNanotube = 1124
@@ -242,8 +270,10 @@ class DysonSphereItem(enum.IntEnum):
 	AnnihilationConstraintSphere = 1403
 	Thruster = 1405
 	ReinforcedThruster = 1406
+	Engine = 1407
 	LogisticsDrone = 5001
 	LogisticsVessel = 5002
+	LogisticsBots = 5003
 	FrameMaterial = 1125
 	DysonSphereComponent = 1502
 	SmallCarrierRocket = 1503
@@ -254,15 +284,23 @@ class DysonSphereItem(enum.IntEnum):
 	MagnumAmmoBox = 1601
 	TitaniumAmmoBox = 1602
 	TitaniumAlloyAmmoBox = 1603
+	ShellSet = 1604
+	HighExplosiveShellSet = 1605
+	CrystalShellSet = 1606
+	PlasmaCapsule = 1607
+	AntimatterCapsule = 1608
 	MissileSet = 1609
 	SupersonicMissileSet = 1610
 	GravityMissileSet = 1611
+	JammingCapsule = 1612
+	SuppressingCapsule = 1613
 	ConveyorBeltMKI = 2001
 	ConveyorBeltMKII = 2002
 	ConveyorBeltMKIII = 2003
 	SorterMKI = 2011
 	SorterMKII = 2012
 	SorterMKIII = 2013
+	SorterPile = 2014
 	Splitter = 2020
 	TrafficMonitor = 2030
 	AutomaticPiler = 2040
@@ -277,6 +315,7 @@ class DysonSphereItem(enum.IntEnum):
 	TeslaTower = 2201
 	WirelessPowerTower = 2202
 	SatelliteSubstation = 2212
+	GeothermalPowerStation = 2213
 	WindTurbine = 2203
 	ThermalPowerStation = 2204
 	MiniFusionPowerStation = 2211
@@ -290,6 +329,8 @@ class DysonSphereItem(enum.IntEnum):
 	SprayCoater = 2313
 	AdvancedMiningMachine = 2316
 	QuantumChemicalPlant = 2317
+	StrangeAssembler = 2318
+	StrangeSmelter = 2319
 	SolarPanel = 2205
 	Accumulator = 2206
 	AccumulatorFull = 2207
@@ -303,10 +344,31 @@ class DysonSphereItem(enum.IntEnum):
 	InterstellarLogisticsStation = 2104
 	OrbitalCollector = 2105
 	MatrixLab = 2901
+	StrangeMatrixLab = 2902
+	GaussTurret = 3001
+	LaserTurret = 3002
+	ImplosionCannon = 3003
+	PlasmaTurret = 3004
+	SRPlasmaTurret = 3010
 	MissileTurret = 3005
+	JammingTower = 3006
 	SignalTower = 3007
 	ShieldGenerator = 3008
 	BattlefieldAnalysisBase = 3009
+
+	PrototypeDrone = 5101
+	PrecisionDrone = 5102
+	AttackDrone = 5103
+	Corvette = 5111
+	Destroyer = 5112
+
+	DarkFogMatrix = 5201
+	SiliconBasedNeuron = 5202
+	MatterRecombinator = 5203
+	NegentropySingularity = 5204
+	CoreElement = 5205
+	EnergyShard = 5206
+
 	ElectromagneticMatrix = 6001
 	EnergyMatrix = 6002
 	StructureMatrix = 6003
@@ -315,7 +377,6 @@ class DysonSphereItem(enum.IntEnum):
 	UniverseMatrix = 6006
 
 	# Unknown item ids; replace with correct values
-	Engine = 98701
 
 class LogisticsStationDirection(enum.IntEnum):
 	Unused = 0
