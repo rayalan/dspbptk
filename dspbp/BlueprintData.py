@@ -27,8 +27,16 @@ from .Enums import DysonSphereItem as dsi, PRODUCTION_MACHINES
 
 PLANETARY_LOGISTICS_STATION_STORAGE_SIZE = 4
 INTERSTELLAR_LOGISTICS_STATION_STORAGE_SIZE = 5
+CONVEYORS = [dsi.ConveyorBeltMKI, dsi.ConveyorBeltMKII, dsi.ConveyorBeltMKIII]
+
+class ParameterType(enum.StrEnum):
+	CONVEYOR = 'conveyer'
+	PRODUCTION = 'production'
+	STATION = 'station'
+	UNKNOWN = 'unknown'
 
 class CustomizedParameters():
+	SENTINEL = ParameterType.UNKNOWN
 	"""
 	Base class for buildings with understood parameters which allows them to be reconstructed.
 	"""
@@ -53,11 +61,19 @@ class CustomizedParameters():
 		"""
 		Returns a map of parameter index to values. Any missing parameters will use their original value.
 		"""
-		raise NotImplementedError(f'{self.__class__} unable to map parameter to original indices')
+		if not hasattr(self, '_PARAMETER_KEY_OFFSETS') or not hasattr(self, '_PARAMETERS_OFFSET'):
+			raise NotImplementedError(f'{self.__class__} unable to map parameter to original indices')
+		# For most parameters, this simple approach is sufficient
+		mapping = {}
+		for key, offset in self._PARAMETER_KEY_OFFSET.items():
+			mapping[self._PARAMETERS_OFFSET + offset] = getattr(self.parameters, key)
+		return mapping
+
+
 
 class LogisticsDistributorParameters(CustomizedParameters):
 	_Parameters = collections.namedtuple('Parameters', [ "supply_icarus_logic", "supply_logic", "work_energy", "autofill"])
-	__PARAMETER_KEY_OFFSETS = {
+	_PARAMETER_KEY_OFFSETS = {
 		'supply_icarus_logic' : 0,
 		'supply_logic' : 1,
 		'work_energy' : 2,
@@ -72,7 +88,7 @@ class LogisticsDistributorParameters(CustomizedParameters):
 		super().__init__(parameters)
 		self._parameters = self._Parameters(**{
 			key :
-				self.__PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self.__PARAMETER_KEY_OFFSETS.items()
+				self.__PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self._PARAMETER_KEY_OFFSETS.items()
 		})
 
 	@property
@@ -85,17 +101,20 @@ class LogisticsDistributorParameters(CustomizedParameters):
 
 
 class ProductionBuildingParameters(CustomizedParameters):
+	SENTINEL = ParameterType.PRODUCTION
 	_Parameters = collections.namedtuple('Parameters', [ 'proliferation_effect'])
-	__PARAMETER_KEY_OFFSETS = {
+
+	_PARAMETERS_OFFSET = 0
+	_PARAMETER_KEY_OFFSETS = {
 		'proliferation_effect' : 0,
 	}
-	__PARAMETER_CONVERTERS = {
+	_PARAMETER_CONVERTERS = {
 		'proliferation_effect' : ProliferationEffect
 	}
 	def __init__(self, parameters):
 		super().__init__(parameters)
 		self._parameters = self._Parameters(**{
-			key : self.__PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self.__PARAMETER_KEY_OFFSETS.items()
+			key : self._PARAMETER_CONVERTERS.get(key, lambda x: x)(parameters[offset]) for key, offset in self._PARAMETER_KEY_OFFSETS.items()
 		})
 
 	@property
@@ -105,8 +124,8 @@ class ProductionBuildingParameters(CustomizedParameters):
 	def to_dict(self):
 		return self.parameters._asdict()
 
-
 class StationParameters(CustomizedParameters):
+	SENTINEL = ParameterType.STATION
 	_Parameters = collections.namedtuple("Parameters", [ "work_energy", "drone_range", "vessel_range", "orbital_collector", "warp_distance", "equip_warper", "drone_count", "vessel_count" ])
 	_STORAGE_OFFSET = 0
 	_SLOTS_OFFSET = _STORAGE_OFFSET + 192
@@ -140,6 +159,7 @@ class StationParameters(CustomizedParameters):
 		self._storage = self._parse_storage(parameters, storage_len)
 		self._slots = self._parse_slots(parameters, slots_len)
 		self._parameters = self._parse_parameters(parameters)
+		self._raw_parameters = parameters
 
 	@property
 	def storage(self):
@@ -308,6 +328,8 @@ class BlueprintBuilding():
 			return LogisticsDistributorParameters(self._parameters)
 		elif self.item in PRODUCTION_MACHINES:
 			return ProductionBuildingParameters(self._parameters)
+		elif self.item in CONVEYORS:
+			return ConveyorBeltParameters(self._parameters)
 		return self._parameters
 
 	@property
@@ -329,6 +351,8 @@ class BlueprintBuilding():
 			raw_parameters = self.parameters.raw_parameters
 		except AttributeError:
 			pass
+		if len(raw_parameters) != self._fields.parameter_count:
+			raise  ValueError("Parameter length mismatch")
 		return self._BLUEPRINT_BUILDING.pack(self._fields._asdict()) + b''.join([value.to_bytes(length=4, byteorder='little') for value in raw_parameters])
 
 	@classmethod
