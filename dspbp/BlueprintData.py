@@ -92,8 +92,26 @@ class LogisticsDistributorParameters(CustomizedParameters):
 		})
 
 	@property
-	def _encode_parameter_map(self):
-		return self.__PARAMETER_KEY_OFFSETS
+	def parameters(self):
+		return self._parameters
+
+class ConveyorBeltParameters(CustomizedParameters):
+	SENTINEL = ParameterType.CONVEYOR
+	_Parameters = collections.namedtuple('Parameters', ['memo_icon', 'memo_number'])
+	_PARAMETERS_OFFSET = 0
+	_PARAMETER_KEY_OFFSETS = {
+		'memo_icon' : 0,
+		'memo_number' : 1,
+	}
+
+	def __init__(self, parameters):
+		super().__init__(parameters)
+		if parameters:
+			self._parameters = self._Parameters(**{
+				key : parameters[offset] for key, offset in self._PARAMETER_KEY_OFFSETS.items()
+			})
+		else:
+			self._parameters = None
 
 	@property
 	def parameters(self):
