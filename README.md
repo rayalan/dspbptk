@@ -31,11 +31,32 @@ See `./dspbptk --help` for a list of all commands and arguments.
 # How to use it
 
 ## Basic setup
+
+
+Installation:
 ```
 git clone https://github.com/rayalan/dspbptk.git
 cd dspbptk
 ./dspbptk --help
+```
+
+Save a blueprint from the clipboard to a file with a description:
+```
+./dspbptk annotate -vbr
+```
+
+Display some information about a blueprint:
+```
 ./dspbptk dump path/to/blueprint
+```
+
+Save blueprint from the clipboard while transforming copper smelting to iron smelting along with associated storages:
+```
+./dspbptk annotate -vbr -s CopperIngot:IronIngot
+```
+
+Convert a blueprint to JSON:
+```
 ./dpsbptk bp2json path/to/blueprint example.json
 cat example.json
 ```
@@ -74,6 +95,20 @@ TBD
 TBD
 
 # For developers
+
+## Testing
+
+To install test support:
+
+```
+pip install -U pytest
+
+```
+and then run with:
+
+```
+python -m pytest
+```
 
 ## inspect
 
