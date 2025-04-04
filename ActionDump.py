@@ -22,7 +22,8 @@ import json
 import collections
 from BaseAction import BaseAction
 from dspbp.Blueprint import Blueprint
-from dspbp.Enums import DysonSphereItem
+from dspbp.Enums import DysonSphereItem, Recipe
+from dspbp.BlueprintData import ParameterType
 
 class ActionDump(BaseAction):
 	def run(self):
@@ -32,7 +33,14 @@ class ActionDump(BaseAction):
 			bpd = bp.decoded_data
 
 			building_counter = collections.Counter()
+			item_storage_counter = collections.Counter()
 			for building in bpd.buildings:
+				# IMPROVE: Why are we checking for conveyer sentinel when we're looking for storage? I suspect
+				# this was an asleep at the switch mistake; revisit when there's a chance.
+				# if building.parameters.SENTINEL == ParameterType.CONVEYOR and building.parameters.parameters:
+				# 	item_storage_counter[(building.data.item_id, building.parameters.parameters.memo_icon)] += 1
+
+
 				building_counter[(building.data.item_id, building.data.recipe_id)] += 1
 
 			if bp.short_desc != "":
@@ -48,7 +56,14 @@ class ActionDump(BaseAction):
 					item_name = item.name
 				except ValueError:
 					item_name = f"[{item_id}]"
-				print("%5d  %s %s" % (count, item_name, recipe_id))
+				print(f'{count:5} {item_name} {(Recipe(recipe_id).name if recipe_id in Recipe else 'Unknown'):20} ({recipe_id:3})')
+
+			if item_storage_counter:
+				print(f'\nStored items:')
+			for ((container_id, item_id), count) in item_storage_counter.most_common():
+				print(f'{count:5} {DysonSphereItem(container_id).name if container_id in DysonSphereItem else 'Unknown'} / {DysonSphereItem(item_id).name if item_id in DysonSphereItem else 'Unknown'} ({item_id:3})')
+
+
 			if len(self._args.inputs) > 1:
 				print()
 
