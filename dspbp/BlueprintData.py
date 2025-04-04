@@ -117,6 +117,11 @@ class ConveyorBeltParameters(CustomizedParameters):
 	def parameters(self):
 		return self._parameters
 
+	def to_dict(self):
+		if self.parameters:
+			return self.parameters._asdict()
+		return {}
+
 
 class ProductionBuildingParameters(CustomizedParameters):
 	SENTINEL = ParameterType.PRODUCTION
