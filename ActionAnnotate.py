@@ -30,6 +30,7 @@ from dspbp.Utils import maybeDysonSphereItem, maybeRecipe
 from dspbp.Recipes import ItemProduction, RECIPE_MAP, Machine
 from dspbp.Assess import Assessment, derive_destination_folder
 import dspbp.Recipes as Recipes
+from dspbp.BlueprintData import BlueprintBuilding
 
 REPRESENTATION_MAP = {
 	# Tech levels
@@ -69,6 +70,66 @@ ICON_LAYOUT_MAP = {
 class ActionAnnotate(BaseAction):
 	def run(self):
 		for filename, bp in self.blueprints(self._args.inputs):
+			original_string = bp.serialize()
+
+			if self._args.substitute:
+				source_recipe, _, target_recipe = self._args.substitute.partition(':')
+				print(f'{source_recipe} --> {target_recipe}')
+				if not source_recipe or not target_recipe:
+					raise ValueError('Substitution must be in the format recipe1:recipe2')
+				try:
+					source_recipe = Recipe[source_recipe]
+				except KeyError:
+					print(f'Unknown source recipe `{source_recipe}`. Known recipes include:')
+					print(', '.join(recipe.name for recipe in dsi))
+					raise
+				try:
+					target_recipe = Recipe[target_recipe]
+				except KeyError:
+					# Add error print out
+					raise
+
+				source_recipe_details = RECIPE_MAP[source_recipe]
+				target_recipe_details = RECIPE_MAP[target_recipe]
+				ingredient_map = {}
+				for source_output, target_output in zip(source_recipe_details.outputs, target_recipe_details.outputs):
+					ingredient_map[source_output] = target_output
+				for source_input, target_input in zip(source_recipe_details.inputs, target_recipe_details.inputs):
+					ingredient_map[source_input] = target_input
+				print(ingredient_map)
+
+				decoded_data = bp.decoded_data
+
+				for index, building in enumerate(decoded_data.buildings):
+					item_type = maybeDysonSphereItem(building.data.item_id)
+					if item_type == dsi.PlanetaryLogisticsStation:
+						pass
+					if building.data.recipe_id == source_recipe.value:
+						building._fields = building.data._replace(recipe_id=target_recipe.value)
+					if building.data.filter_id in ingredient_map:
+						building._fields = building.data._replace(filter_id=ingredient_map[building.data.filter_id])
+					if item_type in [dsi.PlanetaryLogisticsStation, dsi.InterstellarLogisticsStation]:
+						for storage_ix, storage in enumerate(building.parameters.storage):
+							if not storage:
+								continue
+							# storage_item = maybeDysonSphereItem(storage[])
+							if storage['item_id'] in ingredient_map:
+								print('replaceing', ingredient_map[storage['item_id']])
+								# storage['item_id'] = ingredient_map[storage['item_id']]
+								building.parameters.set_storage(storage_ix,
+									'item_id', ingredient_map[storage['item_id']].value)
+								print(f'updated {storage_ix}: {building.parameters.storage}')
+
+						print(building.parameters._raw_parameters)
+					if not hasattr(building.parameters, '_TYPE'):
+						pass
+					elif building.parameters._TYPE == 'conveyor' and building.parameters.parameters:
+						print(building.parameters.parameters.memo_icon, building.parameters.parameters.memo_number)
+						if building.parameters.parameters.memo_icon in ingredient_map:
+							building.parameters.parameters.memo_icon = ingredient_map[building.parameters.memo_icon]
+
+				bp._data = decoded_data.serialize()
+
 			assessment = Assessment(bp)
 			tech_level = assessment.tech_level
 
@@ -144,6 +205,8 @@ class ActionAnnotate(BaseAction):
 			pieces += ['', 'Inputs:']
 			pieces += [f'    {input.name:20}: {round(amount, 1):6}/sec' for input, amount in assessment.inputs.items()]
 			pieces += ['']
+			print(additional_imports)
+			print(additional_exports)
 			if additional_imports:
 				pieces.append(f'Additional imports: {', '.join(import_.name for import_ in additional_imports)}')
 			if additional_exports:
@@ -156,7 +219,7 @@ class ActionAnnotate(BaseAction):
 				folder if (self._args.move or not filename) else head,
 				f'{short_description}.txt' if (self._args.rename or not filename) else tail
 			)}'
-			should_rename = not os.path.exists(final_name) or not os.path.samefile(final_name, filename)
+			should_rename = not filename or not os.path.exists(final_name) or not os.path.samefile(final_name, filename)
 
 			if self._args.verbose:
 				print(f'>>> Blueprint source: {filename}')
@@ -231,4 +294,5 @@ class ActionAnnotate(BaseAction):
 			parser.add_argument("-r", '--rename', action='store_true', help='Also rename blueprints')
 			parser.add_argument("-m", '--move', action='store_true', help='Also move blueprints')
 			parser.add_argument("-b", '--override-text', action='store_true', help='Override non-blank descriptions and icons')
+			parser.add_argument("-s", '--substitute', type=str, help='Specify `recipe1:recipe2` to substitute recipes and storage')
 		multicommand.register("annotate", "Annotate blueprint descriptions and icons", genparser, action = cls)
